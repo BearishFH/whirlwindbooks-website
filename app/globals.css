@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-inria-serif), serif;
+    background-color: #2a2d34;
+    color: #f5f5f0;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto;
+  }
+
+  .font-serif {
+    font-family: var(--font-inria-serif), serif;
+  }
+
+  .font-sans {
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  .shimmer-text {
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(90deg, #d4b483 0%, #f5f5f0 25%, #d4b483 50%, #f5f5f0 75%, #d4b483 100%);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+
+  .shimmer-line {
+    background: linear-gradient(90deg, transparent 0%, #d4b483 25%, #f5f5f0 50%, #d4b483 75%, transparent 100%);
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .mystery-glow {
+    text-shadow: 0 0 20px rgba(212, 180, 131, 0.3), 0 0 40px rgba(212, 180, 131, 0.1);
+  }
+
+  .mystery-button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mystery-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .mystery-button:hover::before {
+    left: 100%;
+  }
+
+  .atmospheric-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
+    z-index: 5;
+    mix-blend-mode: multiply;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2126;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4b483;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a68a56;
+}
