@@ -28,6 +28,13 @@ export default function Footer() {
             EU Data Policy
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
           </Link>
+          <Link
+            href="/contact"
+            className="text-soft-ivory/60 hover:text-gold transition-all duration-300 font-serif text-base tracking-wide relative group"
+          >
+            Contact
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
+          </Link>
         </div>
 
         <div className="text-center">
