@@ -11,6 +11,8 @@
     font-family: var(--font-inria-serif), serif;
     background-color: #2a2d34;
     color: #f5f5f0;
+  margin: 0;
+  padding: 0;
   }
 }
 

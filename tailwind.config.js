@@ -60,6 +60,7 @@ module.exports = {
       fontFamily: {
         serif: ["var(--font-inria-serif)", "serif"],
         sans: ["var(--font-inter)", "sans-serif"],
+      
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -69,4 +70,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
