@@ -28,7 +28,7 @@ const books = [
 
     cover: "/images/main/img5.png",
   },
-  
+
   {
     id: "6",
     cover: "/images/main/img1.png",
@@ -52,6 +52,7 @@ const books = [
 
     cover: "/images/main/img5.png",
   },
+  
 ];
 
 
@@ -64,7 +65,7 @@ const HomePage: React.FC = () => {
         bookId="cyprus-agenda"
       />
 
-      <div className="bg-[#262626] ">
+      <div className="bg-[#262626]">
           <BookGrid title="Featured Books" books={books}  />
        
       </div>

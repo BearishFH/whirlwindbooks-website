@@ -33,14 +33,14 @@ const bookCovers: string[] = [
 const BookCoverGrid: React.FC<BookCoverGridProps> = ({ covers }) => (
   <div className="hidden lg:block w-1/2 h-screen ">
     <div className="relative w-full h-full overflow-hidden ">
-      <div className="relative z-10 grid grid-cols-3 grid-rows-4 h-full gap-x-4 gap-y-2  ">
+      <div className="relative z-10 grid grid-cols-3 grid-rows-4 h-full gap-x-4 gap-y-[90px]  ">
         {covers.map((cover: string, index: number) => (
           <div
             key={index}
-            className="relative w-full rounded-lg overflow-hidden "
+            className="relative w-full rounded-lg overflow-hidden"
             style={{
-              aspectRatio: "2/3",
-              maxHeight: "calc((90vh - 8rem) / 3)",
+              aspectRatio: "1/1",
+              maxHeight: "calc((90vh - 3rem) / 3)",
             }}
           >
             <Image

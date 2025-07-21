@@ -12,17 +12,17 @@ interface Book {
 }
 
 interface BookGridProps {
-  title?: string;            // unused in simple mode
+  title?: string;          
   books: Book[];
-  simple?: boolean;          // NEW flag
+  simple?: boolean;     
 }
 
 const BookGrid: React.FC<BookGridProps> = ({
   title,
   books,
-  simple = false,           // default is full mode
+  simple = false,       
 }) => {
-  // fallback data only for full mode
+ 
   const fallbackBooks: Book[] = [
     { id: "1", cover: "/images/main/img1.png" },
     { id: "2", cover: "/images/main/img2.png" },
@@ -34,10 +34,13 @@ const BookGrid: React.FC<BookGridProps> = ({
     { id: "8", cover: "/images/main/img1.png" },
     { id: "9", cover: "/images/main/img2.png" },
     { id: "10", cover: "/images/main/img3.png" },
+    { id: "11", cover: "/images/main/img2.png" },
+    { id: "12", cover: "/images/main/img3.png" },
   ];
+
 if (simple) {
   return (
-    <div className=" grid grid-cols-6 gap-[120px] overflow-hidden  ml-[-70px]  py-4">
+    <div className="w-screen  gap-1 ml-[-150px]  flex flex-shrink-0 py-4">
       {books.map((book, idx) => (
         <BookItem key={book.id} book={book} index={idx} isFirstRow={false} />
       ))}
@@ -46,17 +49,19 @@ if (simple) {
 }
 
 
+
+
   // Full mode (original): two rows with fallback
   const booksToUse = books.length > 0 ? books : fallbackBooks;
 
   return (
     <section className="py-8 bg-[#1a1a1a]">
-      <div className="container mx-auto px-6 ml-[10px]">
-        <h2 className="text-white text-[32px] font-bold mb-6">
+      <div className="container mx-auto px-6  ml-[10px] ">
+        <h2 className="text-white  text-[32px] font-bold mb-6">
           Continue Reading for Jackie
         </h2>
-        <div className="flex flex-wrap gap-4 justify-center ml-[-30px]">
-          {booksToUse.slice(0, 5).map((book, idx) => (
+        <div className="flex   flex-shrink gap-1 justify-center ">
+          {booksToUse.slice(0, 6).map((book, idx) => (
             <BookItem key={book.id} book={book} index={idx} isFirstRow={true} />
           ))}
         </div>
@@ -64,8 +69,8 @@ if (simple) {
         <h2 className="text-white text-[32px] font-bold mb-6 mt-10">
           Your Next Reading
         </h2>
-        <div className="flex flex-wrap gap-4 justify-center ml-[-30px]">
-          {booksToUse.slice(5, 10).map((book, idx) => (
+        <div className="flex flex-shrink gap-1 justify-center">
+          {booksToUse.slice(4, 10).map((book, idx) => (
             <BookItem
               key={book.id}
               book={book}
@@ -84,15 +89,15 @@ const BookItem: React.FC<{
   index: number;
   isFirstRow: boolean;
 }> = ({ book, index, isFirstRow }) => {
-  const hasBookmark = isFirstRow && (index === 0 || index === 1);
-  const hasInfoIcon = isFirstRow && index === 2;
+  const hasBookmark = isFirstRow && (index === 0 || index === 1 || index === 2 );
+  const hasInfoIcon = isFirstRow && ( index ===  1|| index === 2);
 
   return (
     <Link
       href={`/insideBook/${book.id}`}
-      className="group block w-[228px] h-[142px]"
+      className="group block  w-[228px] h-[142px]"
     >
-      <div className="relative w-full h-full rounded-lg overflow-hidden">
+      <div className=" w-[228px]  ml-[80px] relative h-[142px]  rounded-lg overflow-hidden">
         <Image
           src={book.cover}
           alt={book.title ?? "Book cover"}
@@ -101,19 +106,19 @@ const BookItem: React.FC<{
         />
 
         {hasBookmark && (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-2 left-2 z-10   mt-[-10px]">
             <Image
               src="/images/main/bookmark.png"
               alt="Bookmark"
-              width={24}
+              width={84}
               height={24}
             />
           </div>
         )}
 
         {hasInfoIcon && (
-          <div className="absolute top-2 right-2 z-10">
-            <InformationBug />
+          <div className="absolute top-2 right-2 z-10 mt-[90px] mr-[10px]">
+            <InformationBug  w={40}/>
           </div>
         )}
 
