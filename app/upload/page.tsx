@@ -327,7 +327,7 @@ export default function UploadPage(): JSX.Element {
                 </div>
                
                 {/* Cover series */}
-                <div className="row-start-2 col-start-1 ">
+                <div className="row-start-2 col-start-1 mt-[12px] ">
                   <label className="block mb-1">Series Cover *</label>
                   <div
                     className="w-full h-32 border border-dashed border-[#C19969] flex items-center justify-center text-gray-500 rounded-lg"
