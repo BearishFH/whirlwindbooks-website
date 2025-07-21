@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Navbar from "@/app/components/layouts/Navbar";
 import { JSX } from "react";

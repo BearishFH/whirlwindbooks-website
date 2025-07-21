@@ -56,8 +56,6 @@ const BookCoverGrid: React.FC<BookCoverGridProps> = ({ covers }) => (
     </div>
   </div>
 );
- 
- 
 const OAuthButton: React.FC<OAuthButtonProps> = ({ onClick, iconSrc, alt }) => (
   <button
     onClick={onClick}

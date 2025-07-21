@@ -14,19 +14,17 @@ const HeroBanner: React.FC<HeroBannerProps> = ({
   description,
   backgroundImage = "/images/main/Banner.png",
   bookId,
- 
-
 }) => {
   return (
     <div
       className="relative w-full  bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `url(${backgroundImage})`,
-        aspectRatio: "1440/572", // Matches your banner dimensions
-        minHeight: "400px", // Ensures minimum height on smaller screens
+        aspectRatio: "1440/572", 
+        minHeight: "400px", 
       }}
     >
-      {/* Dark overlay for better text readability */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/20 "></div>
 
       <div className="relative h-full flex  items-center ml-[-130px]">

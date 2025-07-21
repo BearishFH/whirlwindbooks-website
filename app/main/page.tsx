@@ -1,4 +1,4 @@
-// app/page.tsx
+'use client'
 import React from "react";
 import MainLayout from "../components/layouts/MainLayout";
 import HeroBanner from "../components/layouts/HeroBanner";
