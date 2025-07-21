@@ -246,19 +246,37 @@ export default function UploadPage(): JSX.Element {
         <main className="flex-1 p-6 mt-20 space-y-6">
           {mode === "series" && (
             <div className="space-y-6">
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block mb-1">Series Title *</label>
-                  <input
-                    type="text"
-                    placeholder="Resort Lost Icons"
-                    className={inputClass}
-                    style={{ borderRadius: "8px" }}
-                   
-                  />
-                </div> 
-                
+              <div className="grid grid-cols-3 gap-4 ">
+                <div className="">
+                  <div className="">
+                    <label className="block mb-1">Series Title *</label>
+                    <input
+                      type="text"
+                      placeholder="Resort Lost Icons"
+                      className={inputClass}
+                      style={{ borderRadius: "8px" }}
+                    />
+                  </div>
+                  <div className="relative mt-[4px]  mb-4 w-[290px] h-[72px]">
+                    <label className="absolute flex items-center gap-1 text-sm text-gray-400 left-3 top-4 px-1 z-10">
+                      <div
+                        className="w-[32px] h-[32px] flex mr-[10px] items-center justify-center border border-[#C19969] rounded-md"
+                        style={{ borderRadius: "8px" }}
+                      >
+                        <AirPlane w={16} className="  text-[white]" />
+                      </div>
+                      Release on... 01/01/2024
+                    </label>
+                    <input
+                      className={`${inputClass} pt-6 mt-[8px]`}
+                      style={{ borderRadius: "8px" }}
+                      value={formData.releaseDate}
+                      onChange={(e) =>
+                        handleInputChange("releaseDate", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
 
                 <div>
                   <label className="block mb-1">Series Description *</label>
@@ -269,7 +287,7 @@ export default function UploadPage(): JSX.Element {
                     style={{ borderRadius: "8px" }}
                   />
                 </div>
-     
+
                 <div className="">
                   <label className="block  mb-1">
                     Tags, Separate by Commas *
@@ -286,8 +304,10 @@ export default function UploadPage(): JSX.Element {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 items-end">
-                <div className="col-span-2">
+              <div className="grid grid-cols-3  items-end">
+               
+               {/* book series */}
+                <div className="col-span-2  row-start-1">
                   <label className="block mb-1">Books in Series *</label>
                   <div className="flex space-x-2">
                     <input
@@ -305,7 +325,9 @@ export default function UploadPage(): JSX.Element {
                     </button>
                   </div>
                 </div>
-                <div>
+               
+                {/* Cover series */}
+                <div className="row-start-2 col-start-1 ">
                   <label className="block mb-1">Series Cover *</label>
                   <div
                     className="w-full h-32 border border-dashed border-[#C19969] flex items-center justify-center text-gray-500 rounded-lg"
@@ -372,12 +394,12 @@ export default function UploadPage(): JSX.Element {
                 onChange={(e) => handleInputChange("tags", e.target.value)}
               />
             </div>
-          
 
-            <div className="relative mb-4 w-[178px] h-[72px]">
+            <div className="relative mt-[20px] mb-4 w-[178px] h-[72px]">
               <label className="absolute flex items-center gap-1 text-sm text-gray-400 left-3 top-4 px-1 z-10">
-                <div className="w-[32px] h-[32px] flex mr-[10px] items-center justify-center border border-[#C19969] rounded-md"
-                style={{borderRadius:"8px"}}
+                <div
+                  className="w-[32px] h-[32px] flex mr-[10px] items-center justify-center border border-[#C19969] rounded-md"
+                  style={{ borderRadius: "8px" }}
                 >
                   <AirPlane w={16} className="  text-[white]" />
                 </div>

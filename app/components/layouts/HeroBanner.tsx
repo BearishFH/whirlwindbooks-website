@@ -15,7 +15,6 @@ interface HeroBannerProps {
   typeLabel?: string;
   chapters?: number;
   words?: number;
- 
 };
 const HeroBanner: React.FC<HeroBannerProps> = ({
   title,
