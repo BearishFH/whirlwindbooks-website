@@ -9,7 +9,7 @@
 
   body {
     font-family: var(--font-inria-serif), serif;
-    background-color: #2a2d34;
+    background-color: #090808;
     color: #f5f5f0;
   }
 }
@@ -107,3 +107,50 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #a68a56;
 }
+
+/* ============================================================
+   CINEMATIC REDESIGN — shared primitives (v2)
+   ============================================================ */
+:root {
+  --ww-ink: #0a0909;
+  --ww-cream: #f5ead4;
+  --ww-cream-2: #d9cbb5;
+  --ww-gold: #d2a35f;
+  --ww-gold-2: #f0d59b;
+}
+.ww-noir-bg {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(165,77,45,.15), transparent 26rem),
+    radial-gradient(circle at 82% 40%, rgba(92,30,40,.17), transparent 28rem),
+    linear-gradient(180deg,#090808 0%, #0e0c0b 45%, #080707 100%);
+}
+.ww-eyebrow { display:inline-flex; align-items:center; gap:10px; color:var(--ww-gold-2);
+  text-transform:uppercase; letter-spacing:.16em; font-weight:700; font-size:12px; }
+.ww-eyebrow::before { content:""; width:34px; height:1px; background:var(--ww-gold); }
+.ww-display { font-family: var(--font-inria-serif), "Iowan Old Style", Palatino, Georgia, serif;
+  letter-spacing:-.035em; }
+
+/* 3D phone reader */
+.ww-phone { width:min(330px,76vw); aspect-ratio:.51; border-radius:48px; padding:11px;
+  background:linear-gradient(135deg,#2d2b29,#080808 46%,#3b3936);
+  box-shadow:0 42px 110px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.13);
+  transform:rotateY(-8deg) rotateX(3deg) rotateZ(2deg); transition:transform .2s ease-out; position:relative; }
+.ww-phone::before { content:""; position:absolute; width:35%; height:25px; border-radius:0 0 16px 16px;
+  background:#090909; top:10px; left:32.5%; z-index:5; }
+.ww-phone-screen { height:100%; border-radius:39px; overflow:hidden; position:relative; background:#efe7d8; color:#26211d; }
+.ww-reader-top { height:43%; position:relative; overflow:hidden; background:#191717; }
+.ww-reader-top img { width:100%; height:100%; object-fit:cover; object-position:38% center; opacity:.94; }
+.ww-reader-top::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.88)); }
+.ww-reader-meta { position:absolute; inset:auto 22px 20px; z-index:2; color:#fff; }
+.ww-reader-meta small { color:#efcf99; text-transform:uppercase; letter-spacing:.15em; font-weight:700; font-size:11px; }
+.ww-reader-body { height:57%; padding:25px 24px; position:relative; }
+.ww-reader-body p { font-family:Georgia,serif; font-size:12.5px; line-height:1.65; color:#4e443b; }
+.ww-case-note { position:absolute; left:-40px; top:70px; padding:15px 17px; width:180px; transform:rotate(-7deg);
+  background:#e8d2a7; color:#322719; box-shadow:0 14px 30px rgba(0,0,0,.28); font-family:Georgia,serif;
+  font-size:13px; line-height:1.4; z-index:6; }
+.ww-case-note::before { content:"EVIDENCE 01"; display:block; font-weight:900; letter-spacing:.12em; color:#8d3e2b; font-size:9px; margin-bottom:6px; }
+.ww-audio { position:absolute; right:-24px; bottom:110px; width:78px; height:78px; border-radius:50%;
+  background:rgba(19,16,14,.92); border:1px solid rgba(240,213,155,.4); display:grid; place-items:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.55); color:var(--ww-gold-2); z-index:6; cursor:pointer; }
+.ww-audio-ring { position:absolute; inset:-10px; border:1px solid rgba(240,213,155,.16); border-radius:50%; animation:wwpulse 2.6s ease-out infinite; }
+@keyframes wwpulse { 0%{transform:scale(.85);opacity:0;} 30%{opacity:1;} 100%{transform:scale(1.35);opacity:0;} }

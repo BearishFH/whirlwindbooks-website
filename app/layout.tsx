@@ -39,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inriaSerif.variable} ${inter.variable} scroll-smooth`}>
-      <body className="bg-ash-grey text-ivory font-serif antialiased overflow-x-hidden">{children}</body>
+      <body className="bg-[#0a0909] text-ivory font-serif antialiased overflow-x-hidden">{children}</body>
     </html>
   )
 }

@@ -9,7 +9,7 @@ import MysteryParticles from "./components/mystery-particles"
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-ash-grey relative">
+    <main className="min-h-screen bg-[#0a0909] relative">
       <MysteryParticles />
       <div className="atmospheric-overlay"></div>
       <Header />
