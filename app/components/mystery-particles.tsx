@@ -2,6 +2,20 @@
 
 import { useEffect, useRef } from "react"
 
+type Particle = {
+  x: number
+  y: number
+  size: number
+  speedX: number
+  speedY: number
+  opacity: number
+  fadeDirection: number
+}
+
+/**
+ * Slow drifting dust motes behind the page content. Skipped entirely for
+ * visitors who prefer reduced motion, and torn down properly on unmount.
+ */
 export default function MysteryParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -9,76 +23,85 @@ export default function MysteryParticles() {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
+    if (reduceMotion.matches) return
+
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+    let width = 0
+    let height = 0
+    let frame = 0
+    const particles: Particle[] = []
+
+    const seed = () => {
+      // Density scales with the viewport so phones aren't over-drawing.
+      const count = Math.round(Math.min(50, Math.max(18, (width * height) / 26000)))
+      particles.length = 0
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 2 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.4,
+          speedY: (Math.random() - 0.5) * 0.4,
+          opacity: Math.random() * 0.28 + 0.08,
+          fadeDirection: Math.random() > 0.5 ? 1 : -1,
+        })
+      }
     }
 
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
-
-    const particles: Array<{
-      x: number
-      y: number
-      size: number
-      speedX: number
-      speedY: number
-      opacity: number
-      fadeDirection: number
-    }> = []
-
-    // Create particles
-    for (let i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 0.5,
-        speedX: (Math.random() - 0.5) * 0.5,
-        speedY: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.3 + 0.1,
-        fadeDirection: Math.random() > 0.5 ? 1 : -1,
-      })
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      seed()
     }
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, width, height)
 
-      particles.forEach((particle) => {
-        // Update position
-        particle.x += particle.speedX
-        particle.y += particle.speedY
+      for (const p of particles) {
+        p.x += p.speedX
+        p.y += p.speedY
 
-        // Update opacity for twinkling effect
-        particle.opacity += particle.fadeDirection * 0.002
-        if (particle.opacity <= 0.05 || particle.opacity >= 0.3) {
-          particle.fadeDirection *= -1
-        }
+        p.opacity += p.fadeDirection * 0.002
+        if (p.opacity <= 0.05 || p.opacity >= 0.3) p.fadeDirection *= -1
 
-        // Wrap around edges
-        if (particle.x < 0) particle.x = canvas.width
-        if (particle.x > canvas.width) particle.x = 0
-        if (particle.y < 0) particle.y = canvas.height
-        if (particle.y > canvas.height) particle.y = 0
+        if (p.x < 0) p.x = width
+        if (p.x > width) p.x = 0
+        if (p.y < 0) p.y = height
+        if (p.y > height) p.y = 0
 
-        // Draw particle
         ctx.beginPath()
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(212, 180, 131, ${particle.opacity})`
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(210, 163, 95, ${p.opacity})`
         ctx.fill()
-      })
+      }
 
-      requestAnimationFrame(animate)
+      frame = requestAnimationFrame(animate)
     }
 
-    animate()
+    resize()
+    window.addEventListener("resize", resize)
+    frame = requestAnimationFrame(animate)
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas)
+      cancelAnimationFrame(frame)
+      window.removeEventListener("resize", resize)
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-10" />
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 opacity-70"
+    />
+  )
 }
