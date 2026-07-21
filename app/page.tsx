@@ -1,10 +1,7 @@
 import Header from "./components/header"
 import HeroSection from "./components/hero-section"
 import FeaturedSeries from "./components/featured-series"
-import HowItWorks from "./components/how-it-works"
-import GlobalFeatures from "./components/global-features"
-import PricingSection from "./components/pricing-section"
-import CTASection from "./components/cta-section"
+import AppCTA from "./components/app-cta"
 import Footer from "./components/footer"
 import MysteryParticles from "./components/mystery-particles"
 
@@ -16,10 +13,7 @@ export default function HomePage() {
       <Header />
       <HeroSection />
       <FeaturedSeries />
-      <HowItWorks />
-      <GlobalFeatures />
-      <PricingSection />
-      <CTASection />
+      <AppCTA />
       <Footer />
     </main>
   )

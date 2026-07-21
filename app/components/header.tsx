@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import Link from "next/link"
+import { APP_STORE_URL } from "@/lib/links"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -40,13 +40,14 @@ export default function Header() {
         </div>
 
         <nav>
-          <Link
-            href="https://app.whirlwind.com/login"
-            className="text-gold hover:text-ivory transition-all duration-300 font-serif text-lg tracking-wide relative group"
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center rounded-full bg-gradient-to-br from-[#f1d9a4] to-[#c48d49] px-5 font-sans text-[15px] font-bold text-[#24170c] transition-all duration-300 hover:-translate-y-0.5"
           >
-            Login
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+            Get the app
+          </a>
         </nav>
       </div>
     </header>

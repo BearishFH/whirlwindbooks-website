@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { APP_STORE_URL } from "@/lib/links"
 
 export default function HeroSection() {
   const [playing, setPlaying] = useState(false)
@@ -49,12 +50,14 @@ export default function HeroSection() {
                 <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <button
-              onClick={() => scrollTo("experience")}
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex min-h-[54px] items-center rounded-full border border-[rgba(245,234,212,.16)] bg-white/[.04] px-6 font-bold text-[#f5ead4] transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(245,234,212,.32)] hover:bg-white/[.08]"
             >
-              See the experience
-            </button>
+              Get the app
+            </a>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-[13px] text-[#bdb1a1]">

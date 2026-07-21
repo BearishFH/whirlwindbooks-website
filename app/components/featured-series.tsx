@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { APP_STORE_URL } from "@/lib/links"
 
 type Book = {
   slug: string
@@ -163,11 +164,12 @@ export default function FeaturedSeries() {
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-[#d7cabc] pt-6">
                 <span className="text-[12px] text-[#84766c]">Chapter 1 is free · read or listen</span>
                 <a
-                  href="#get"
-                  onClick={() => setActive(null)}
+                  href={APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex min-h-[46px] items-center rounded-full bg-gradient-to-br from-[#f1d9a4] to-[#c48d49] px-5 font-bold text-[#24170c]"
                 >
-                  Keep reading free →
+                  Read it in the app →
                 </a>
               </div>
             </div>
