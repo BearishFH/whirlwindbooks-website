@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation"
 import { getBook } from "@/lib/catalog"
 import { contentForBook, localisedTitle } from "@/lib/catalog-types"
-import { fetchBookText, splitIntoChapters } from "@/lib/reader"
+import { fetchBookText, splitIntoChapters, freePreview } from "@/lib/reader"
+import { hasActiveSubscription } from "@/lib/entitlement"
+import { createClient } from "@/lib/supabase/server"
 import { Reader } from "@/components/app/reader"
 
 export const dynamic = "force-dynamic"
@@ -28,13 +30,21 @@ export default async function ReadPage({
   const content = contentForBook(book)
   const title = localisedTitle(book)
 
-  // TODO(subscription): the iOS app gates the paid body behind an active
-  // RevenueCat subscription (book_contents.paid_starting_text marks where the
-  // free preview ends). The web has no payment flow yet, so any signed-in user
-  // gets the full text. Wire real entitlement checks here when web billing lands.
+  // Entitlement gate — mirrors the iOS app. RevenueCat (keyed to the Supabase
+  // user id) is the cross-platform source of truth, so an Apple OR Stripe
+  // subscription unlocks the full book; everyone else gets the free preview,
+  // and audio (paid) is withheld. Secure by default: unproven = preview only.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const subscribed = user ? await hasActiveSubscription(user.id, supabase) : false
+
   const rawText = content?.content_url ? await fetchBookText(content.content_url) : ""
-  const chapters = splitIntoChapters(rawText)
-  const audioSrc = content?.audio_url ?? null
+  const chapters = subscribed
+    ? splitIntoChapters(rawText)
+    : freePreview(rawText, content?.paid_starting_text ?? null)
+  const audioSrc = subscribed ? content?.audio_url ?? null : null
 
   return (
     <Reader
@@ -45,6 +55,7 @@ export default async function ReadPage({
       audioSrc={audioSrc}
       startInListen={mode === "listen"}
       hadContentUrl={!!content?.content_url}
+      locked={!subscribed}
     />
   )
 }

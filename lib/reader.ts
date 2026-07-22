@@ -63,3 +63,24 @@ function finalise(c: { heading: string; body: string[] }, index: number): Chapte
     paragraphs,
   }
 }
+
+/**
+ * The FREE preview for a non-subscribed reader — mirrors the iOS app's
+ * `freeFirstChapter`. Prefer the `paid_starting_text` marker (everything before
+ * it is free); otherwise fall back to the first chapter; and if the text has no
+ * chapter markers at all, cap to the first few paragraphs so the paid body is
+ * never served. Full chapters are only ever returned to a subscribed user.
+ */
+export function freePreview(rawText: string, paidStartingText: string | null): Chapter[] {
+  const marker = paidStartingText?.trim()
+  if (marker) {
+    const idx = rawText.indexOf(marker)
+    if (idx > 0) return splitIntoChapters(rawText.slice(0, idx))
+  }
+  const chapters = splitIntoChapters(rawText)
+  if (chapters.length > 1) return chapters.slice(0, 1)
+  // Single chapter (no markers): hard-cap so we never leak the full body.
+  const only = chapters[0]
+  if (!only) return []
+  return [{ ...only, paragraphs: only.paragraphs.slice(0, 8) }]
+}

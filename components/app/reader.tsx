@@ -20,6 +20,7 @@ export function Reader({
   audioSrc,
   startInListen,
   hadContentUrl,
+  locked = false,
 }: {
   bookId: string
   title: string
@@ -28,6 +29,7 @@ export function Reader({
   audioSrc: string | null
   startInListen?: boolean
   hadContentUrl: boolean
+  locked?: boolean
 }) {
   const [theme, setTheme] = useState<Theme>("noir")
   const [fontSize, setFontSize] = useState(19)
@@ -256,6 +258,33 @@ export function Reader({
                 {p}
               </p>
             ))}
+
+            {/* Free-preview wall — shown at the end of the free chapter for a
+                non-subscribed reader. Subscribing on any platform unlocks it. */}
+            {locked && chapterIdx >= chapters.length - 1 ? (
+              <div
+                className="mt-10 rounded-2xl border p-8 text-center"
+                style={{ borderColor: "rgba(212,168,67,.35)", background: "rgba(212,168,67,.06)" }}
+              >
+                <p className="font-sans text-xs uppercase tracking-[0.2em]" style={{ color: "#D4A843" }}>
+                  Free preview
+                </p>
+                <p className="mt-3 font-serif text-2xl" style={{ color: t.text }}>
+                  Don&apos;t stop now.
+                </p>
+                <p className="mx-auto mt-2 max-w-md font-sans text-sm" style={{ color: t.muted }}>
+                  You&apos;ve read the free first chapter. Subscribe to unlock the whole book and the
+                  English audiobook — your subscription works in the app and on the web.
+                </p>
+                <a
+                  href="/account"
+                  className="mt-6 inline-block rounded-full px-7 py-3 font-sans text-sm font-semibold"
+                  style={{ background: "#D4A843", color: "#0a0909" }}
+                >
+                  Subscribe to keep reading
+                </a>
+              </div>
+            ) : null}
 
             {/* Chapter nav */}
             <div className="mt-12 flex items-center justify-between border-t pt-6" style={{ borderColor: "rgba(120,110,95,.2)" }}>
