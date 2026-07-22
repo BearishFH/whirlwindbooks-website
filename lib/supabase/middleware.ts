@@ -37,17 +37,28 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Routes that require a signed-in user.
-  const protectedPrefixes = ["/browse", "/book", "/read", "/account", "/library"]
-  const isProtected = protectedPrefixes.some(
+  // App routes that need SOME authenticated session for Supabase RLS to return
+  // the catalogue. Reading the catalogue only requires the `authenticated` role,
+  // which an anonymous session satisfies.
+  const appPrefixes = ["/browse", "/book", "/read", "/account", "/library"]
+  const isAppRoute = appPrefixes.some(
     (p) => pathname === p || pathname.startsWith(p + "/"),
   )
 
-  if (!user && isProtected) {
+  if (!user && isAppRoute) {
+    // No login wall — mirror the iOS app: give the visitor a silent anonymous
+    // account so they can browse and read the free first chapter immediately.
+    // Redirect to the same URL so the new session cookies apply before render.
+    const { error } = await supabase.auth.signInAnonymously()
     const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    url.searchParams.set("redirect", pathname)
-    return NextResponse.redirect(url)
+    if (error) {
+      // Only if anon sign-in genuinely fails do we fall back to the sign-in page.
+      url.pathname = "/login"
+      url.searchParams.set("redirect", pathname)
+    }
+    const redirect = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+    return redirect
   }
 
   return supabaseResponse

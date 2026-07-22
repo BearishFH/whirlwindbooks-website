@@ -36,7 +36,14 @@ export function splitIntoChapters(text: string): Chapter[] {
   const chapters: Chapter[] = []
   let current: { heading: string; body: string[] } | null = null
 
-  for (const line of lines) {
+  for (const rawLine of lines) {
+    // Strip Markdown so the reader never shows raw syntax (#, ##, ---, **, `).
+    if (/^\s*([-*_]\s*){3,}$/.test(rawLine)) continue // horizontal rule
+    const line = rawLine
+      .replace(/^\s*#{1,6}\s+/, "") // heading hashes -> plain text
+      .replace(/\*\*|__/g, "") // bold
+      .replace(/`/g, "") // inline code ticks
+
     if (CHAPTER_RE.test(line) && line.trim().length < 60) {
       if (current) chapters.push(finalise(current, chapters.length))
       current = { heading: line.trim(), body: [] }
@@ -46,6 +53,15 @@ export function splitIntoChapters(text: string): Chapter[] {
     }
   }
   if (current) chapters.push(finalise(current, chapters.length))
+
+  // Drop a tiny leading front-matter block (e.g. just the book title before the
+  // first real chapter) so the reader opens on Chapter One, not a title page.
+  while (
+    chapters.length > 1 &&
+    chapters[0].paragraphs.join(" ").trim().length < 200
+  ) {
+    chapters.shift()
+  }
 
   return chapters.filter((c) => c.paragraphs.length > 0 || c.heading)
 }
@@ -72,15 +88,18 @@ function finalise(c: { heading: string; body: string[] }, index: number): Chapte
  * never served. Full chapters are only ever returned to a subscribed user.
  */
 export function freePreview(rawText: string, paidStartingText: string | null): Chapter[] {
+  // Prefer the explicit paid boundary (everything before it is free).
   const marker = paidStartingText?.trim()
   if (marker) {
     const idx = rawText.indexOf(marker)
     if (idx > 0) return splitIntoChapters(rawText.slice(0, idx))
   }
-  const chapters = splitIntoChapters(rawText)
-  if (chapters.length > 1) return chapters.slice(0, 1)
-  // Single chapter (no markers): hard-cap so we never leak the full body.
-  const only = chapters[0]
-  if (!only) return []
-  return [{ ...only, paragraphs: only.paragraphs.slice(0, 8) }]
+  // Otherwise cap to ~the first chapter's worth of text (matches the iOS
+  // ~14k-char free cap), cut on a paragraph boundary so it never dumps the
+  // paid body but still reads as a complete opening.
+  const CAP = 14000
+  if (rawText.length <= CAP) return splitIntoChapters(rawText)
+  let cut = rawText.lastIndexOf("\n\n", CAP)
+  if (cut < CAP * 0.5) cut = CAP
+  return splitIntoChapters(rawText.slice(0, cut))
 }
