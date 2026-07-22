@@ -4,6 +4,11 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Public client keys (safe to expose — same anon key the iOS app ships). The
+  # RevenueCat SECRET key is intentionally NOT here; set REVENUECAT_SECRET_KEY in
+  # the Netlify UI (server-only) to enable cross-platform entitlement checks.
+  NEXT_PUBLIC_SUPABASE_URL = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbXFocHVoanFib21ycHV1b3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3MjA0NDgsImV4cCI6MjA2MzI5NjQ0OH0.NThXXKetrK2iPAENglmzJB8tuIXxEZoMqK1--jXWeWA"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
