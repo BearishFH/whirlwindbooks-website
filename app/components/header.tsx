@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { APP_STORE_URL } from "@/lib/links"
 
 const NAV = [
   { href: "#how-it-works", label: "How it works" },
@@ -63,14 +62,20 @@ export default function Header() {
           ))}
         </nav>
 
-        <a
-          href={APP_STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ww-btn ww-btn-gold !min-h-[42px] !px-4 !text-[14px] md:!min-h-[46px] md:!px-5 md:!text-[15px]"
-        >
-          Get the app
-        </a>
+        <div className="flex items-center gap-2 md:gap-3">
+          <a
+            href="/login"
+            className="font-sans text-[14px] text-[#c9bcaa] transition-colors hover:text-[#f5ead4]"
+          >
+            Sign in
+          </a>
+          <a
+            href="/login"
+            className="ww-btn ww-btn-gold !min-h-[42px] !px-4 !text-[14px] md:!min-h-[46px] md:!px-5 md:!text-[15px]"
+          >
+            Read on web
+          </a>
+        </div>
       </div>
     </header>
   )
