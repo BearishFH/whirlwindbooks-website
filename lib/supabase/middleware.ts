@@ -40,7 +40,7 @@ export async function updateSession(request: NextRequest) {
   // App routes that need SOME authenticated session for Supabase RLS to return
   // the catalogue. Reading the catalogue only requires the `authenticated` role,
   // which an anonymous session satisfies.
-  const appPrefixes = ["/browse", "/book", "/read", "/account", "/library"]
+  const appPrefixes = ["/browse", "/book", "/read", "/account", "/library", "/start"]
   const isAppRoute = appPrefixes.some(
     (p) => pathname === p || pathname.startsWith(p + "/"),
   )
