@@ -15,12 +15,16 @@ export default async function LoginPage({
 }) {
   const { redirect: redirectTo, error } = await searchParams
 
-  // Already signed in? Straight into the app.
+  // Already signed in with a REAL account? Straight into the app. Anonymous
+  // (guest) sessions must still be able to reach this page so a returning /
+  // subscribed reader can sign into their actual account and get their content.
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (user) redirect(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/browse")
+  if (user && !user.is_anonymous) {
+    redirect(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/browse")
+  }
 
   return (
     <div className="ww-noir-bg relative flex min-h-screen flex-col items-center justify-center px-6 py-16">

@@ -64,13 +64,24 @@ export function AppNav({ email }: { email?: string | null }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/account"
-            title={email ?? "Account"}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(210,163,95,.35)] bg-[rgba(210,163,95,.12)] font-sans text-sm font-bold uppercase text-[#f0d59b] transition-colors hover:bg-[rgba(210,163,95,.22)]"
-          >
-            {(email?.[0] ?? "W").toUpperCase()}
-          </Link>
+          {email ? (
+            // Signed-in reader → account avatar.
+            <Link
+              href="/account"
+              title={email}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(210,163,95,.35)] bg-[rgba(210,163,95,.12)] font-sans text-sm font-bold uppercase text-[#f0d59b] transition-colors hover:bg-[rgba(210,163,95,.22)]"
+            >
+              {email[0].toUpperCase()}
+            </Link>
+          ) : (
+            // Guest (anonymous) reader → let an existing/subscribed reader sign in.
+            <Link
+              href="/login"
+              className="rounded-full border border-[rgba(210,163,95,.4)] bg-[rgba(210,163,95,.14)] px-4 py-2 font-sans text-[13px] font-semibold text-[#f0d59b] transition-colors hover:bg-[rgba(210,163,95,.24)]"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </header>
