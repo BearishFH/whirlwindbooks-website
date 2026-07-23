@@ -3,16 +3,24 @@
 const SUPABASE = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
 const SUPABASE_WS = "wss://zpmqhpuhjqbomrpuuoye.supabase.co"
 
+// RevenueCat Web SDK + Paddle-hosted checkout. The SDK talks to
+// *.revenuecat.com / *.rev.cat; the checkout renders in an iframe served from
+// pay.rev.cat which embeds Paddle (*.paddle.com / *.paddlecdn.com).
+const REVENUECAT = "https://*.revenuecat.com https://*.rev.cat"
+const PADDLE = "https://*.paddle.com https://*.paddlecdn.com"
+
 // Helmet-equivalent security headers. CSP is scoped so the app still works:
-// self for code/markup, Supabase for data/images/audio, and clickjacking is
-// blocked outright with frame-ancestors 'none'.
+// self for code/markup, Supabase for data/images/audio, RevenueCat+Paddle for
+// checkout, and clickjacking is blocked outright with frame-ancestors 'none'.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${PADDLE}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${SUPABASE}`,
+  `img-src 'self' data: blob: ${SUPABASE} ${PADDLE}`,
   `media-src 'self' blob: ${SUPABASE}`,
-  `connect-src 'self' ${SUPABASE} ${SUPABASE_WS}`,
+  `connect-src 'self' ${SUPABASE} ${SUPABASE_WS} ${REVENUECAT} ${PADDLE}`,
+  `frame-src 'self' ${REVENUECAT} ${PADDLE}`,
+  "worker-src 'self' blob:",
   "font-src 'self' data:",
   "frame-ancestors 'none'",
   "base-uri 'self'",
