@@ -82,8 +82,8 @@ export default async function SubscribePage() {
                 <span className="text-[#f0d59b]">unlocked.</span>
               </h1>
               <p className="mx-auto mt-6 max-w-xl font-serif text-[17px] leading-relaxed text-[#d9cbb5] [text-shadow:0_1px_24px_rgba(0,0,0,.95)] md:text-[19px]">
-                The full library to read or listen — a new snackable mystery every week. One
-                membership covers the web and the iOS app. Cancel anytime.
+                The full library to read or listen — lots of new mysteries every week, in 12
+                languages. One membership covers the web and the iOS app. Cancel anytime.
               </p>
 
               <div className="mt-10 w-full">

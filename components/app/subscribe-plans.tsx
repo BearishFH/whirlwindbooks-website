@@ -19,11 +19,21 @@ type Plan = {
   title: string
   price: string
   period: string
+  // Raw price for computing the annual saving.
+  micros: number
   // Opaque handle back to the RC package object, resolved at purchase time.
   index: number
 }
 
 const RC_KEY = process.env.NEXT_PUBLIC_RC_WEB_BILLING_KEY
+
+// Value props shared by both plans — every membership unlocks all of this.
+const BENEFITS = [
+  "Every mystery in 12 languages",
+  "Lots of new mysteries every week",
+  "English audiobook editions",
+  "Reads on the web and the iOS app",
+]
 
 export function SubscribePlans({ appUserId }: { appUserId: string }) {
   const router = useRouter()
@@ -73,6 +83,7 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
             title: product?.title || (period === "per year" ? "Annual" : "Monthly"),
             price: product?.currentPrice?.formattedPrice ?? "",
             period,
+            micros: product?.currentPrice?.amountMicros ?? 0,
             index: i,
           }
         })
@@ -147,9 +158,16 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
     )
   }
 
+  const monthly = plans.find((p) => p.period === "per month")
+  const annual = plans.find((p) => p.period === "per year")
+  const savePct =
+    monthly && annual && monthly.micros > 0
+      ? Math.round((1 - annual.micros / (monthly.micros * 12)) * 100)
+      : 0
+
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-stretch gap-4 sm:grid-cols-2">
         {plans.map((plan) => {
           const isAnnual = plan.period === "per year"
           return (
@@ -158,23 +176,43 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
               type="button"
               disabled={buying !== null}
               onClick={() => buy(plan)}
-              className={`group relative flex flex-col items-start rounded-2xl border p-6 text-left shadow-[0_24px_70px_rgba(0,0,0,.6)] backdrop-blur-xl transition-all disabled:opacity-60 ${
+              className={`group relative flex h-full flex-col items-start rounded-2xl border p-6 text-left shadow-[0_24px_70px_rgba(0,0,0,.6)] backdrop-blur-xl transition-all disabled:opacity-60 ${
                 isAnnual
                   ? "border-[rgba(210,163,95,.55)] bg-[#141009]/90 hover:bg-[#171208]/92"
                   : "border-white/15 bg-[#0b0a0d]/88 hover:border-white/30"
               }`}
             >
-              {isAnnual ? (
-                <span className="mb-3 rounded-full bg-[#c0392b] px-3 py-1 font-sans text-[11px] font-bold uppercase tracking-wide text-[#f7e9d0]">
-                  Best value
-                </span>
-              ) : null}
+              {/* Fixed-height badge row keeps titles/prices aligned across cards */}
+              <div className="mb-3 flex h-[26px] items-center">
+                {isAnnual && savePct > 0 ? (
+                  <span className="rounded-full bg-[#c0392b] px-3 py-1 font-sans text-[11px] font-bold uppercase tracking-wide text-[#f7e9d0]">
+                    Best value · Save {savePct}%
+                  </span>
+                ) : isAnnual ? (
+                  <span className="rounded-full bg-[#c0392b] px-3 py-1 font-sans text-[11px] font-bold uppercase tracking-wide text-[#f7e9d0]">
+                    Best value
+                  </span>
+                ) : null}
+              </div>
+
               <span className="ww-display text-xl text-[#f5ead4]">{plan.title}</span>
-              <span className="mt-2 font-sans text-2xl font-semibold text-[#f0d59b]">
-                {plan.price}
-              </span>
-              <span className="font-sans text-[13px] text-[#8a7d6c]">{plan.period}</span>
-              <span className="mt-5 inline-flex ww-btn ww-btn-gold !min-h-[46px] !px-6 text-[14px]">
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="font-sans text-3xl font-semibold text-[#f0d59b]">{plan.price}</span>
+                <span className="font-sans text-[13px] text-[#8a7d6c]">/ {plan.period.replace("per ", "")}</span>
+              </div>
+
+              <ul className="mt-5 mb-6 space-y-2.5">
+                {BENEFITS.map((b) => (
+                  <li key={b} className="flex items-start gap-2.5 font-sans text-[13.5px] leading-snug text-[#cbbfa9]">
+                    <svg viewBox="0 0 20 20" className="mt-[2px] h-4 w-4 flex-none" fill="none" stroke="#d2a35f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m5 10.5 3.5 3.5L15 6.5" />
+                    </svg>
+                    {b}
+                  </li>
+                ))}
+              </ul>
+
+              <span className="mt-auto inline-flex w-full justify-center ww-btn ww-btn-gold !min-h-[48px] !px-6 text-[14px]">
                 {buying === plan.id ? "Opening checkout…" : "Subscribe"}
               </span>
             </button>
