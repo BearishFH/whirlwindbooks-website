@@ -3,14 +3,16 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
-// RevenueCat Web Billing checkout. This mirrors the iOS paywall: the visitor
-// picks a plan, RevenueCat presents its Stripe-backed hosted checkout, and on
-// success the entitlement is live on RevenueCat — which the server-side
-// `hasActiveSubscription()` reads, so reading unlocks on web AND in the app.
+// RevenueCat Web SDK checkout. This mirrors the iOS paywall: the visitor picks
+// a plan, RevenueCat presents the hosted checkout (Paddle Billing is the
+// merchant of record — it handles global VAT), and on success the entitlement
+// is live on RevenueCat — which the server-side `hasActiveSubscription()`
+// reads, so reading unlocks on web AND in the app.
 //
-// The RevenueCat *public* Web Billing key is publishable (like a Stripe
-// publishable key), so it is safe to expose via NEXT_PUBLIC. The secret REST
-// key stays server-only in `lib/entitlement.ts`.
+// The same purchase() flow and the same public key work regardless of the
+// underlying provider (Paddle here). The *public* Web Billing key is
+// publishable, so it is safe to expose via NEXT_PUBLIC. The secret REST key
+// stays server-only in `lib/entitlement.ts`.
 
 type Plan = {
   id: string
@@ -183,7 +185,7 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
         <p className="text-center font-sans text-xs text-[#c98b6b]">{error}</p>
       ) : null}
       <p className="text-center font-sans text-[12px] text-[#6f665a]">
-        Secure checkout by Stripe · Cancel anytime · Unlocks the iOS app too
+        Secure checkout · Tax handled at checkout · Cancel anytime · Unlocks the iOS app too
       </p>
     </div>
   )
