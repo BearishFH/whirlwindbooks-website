@@ -70,7 +70,7 @@ export default function Header() {
             Sign in
           </a>
           <a
-            href="/login"
+            href="/browse"
             className="ww-btn ww-btn-gold !min-h-[42px] !px-4 !text-[14px] md:!min-h-[46px] md:!px-5 md:!text-[15px]"
           >
             Read on web
