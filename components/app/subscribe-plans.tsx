@@ -158,10 +158,10 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
               type="button"
               disabled={buying !== null}
               onClick={() => buy(plan)}
-              className={`group relative flex flex-col items-start rounded-2xl border p-6 text-left transition-all disabled:opacity-60 ${
+              className={`group relative flex flex-col items-start rounded-2xl border p-6 text-left shadow-[0_24px_70px_rgba(0,0,0,.6)] backdrop-blur-xl transition-all disabled:opacity-60 ${
                 isAnnual
-                  ? "border-[rgba(210,163,95,.55)] bg-[rgba(210,163,95,.08)]"
-                  : "border-white/12 bg-white/[0.02] hover:border-white/25"
+                  ? "border-[rgba(210,163,95,.55)] bg-[#141009]/90 hover:bg-[#171208]/92"
+                  : "border-white/15 bg-[#0b0a0d]/88 hover:border-white/30"
               }`}
             >
               {isAnnual ? (

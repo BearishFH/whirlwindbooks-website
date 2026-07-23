@@ -64,8 +64,10 @@ export default async function SubscribePage() {
         {/* Legibility scrims: light overall wash so covers stay vivid, a vignette
             that darkens behind the headline and at the edges, plus a fade into
             the page below. */}
-        <div className="absolute inset-0 bg-[#060508]/35" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_70%_at_50%_40%,rgba(6,5,8,.62)_0%,rgba(6,5,8,.1)_50%,rgba(6,5,8,.9)_100%)]" />
+        <div className="absolute inset-0 bg-[#060508]/40" />
+        {/* Tall central spotlight: darker behind the offer column, covers stay
+            vivid on the flanks, dark vignette at the edges. */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_62%_92%_at_50%_46%,rgba(6,5,8,.82)_0%,rgba(6,5,8,.78)_28%,rgba(6,5,8,.15)_66%,rgba(6,5,8,.92)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-[#060508]" />
 
         <main className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pb-24 pt-28 text-center md:pt-32">
