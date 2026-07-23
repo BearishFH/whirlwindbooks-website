@@ -23,15 +23,12 @@ export async function OriginalsShowcase() {
             cases landing every week.
           </p>
 
-          {/* Reader rating — social proof */}
-          <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-[rgba(210,163,95,.35)] bg-[rgba(210,163,95,.08)] px-5 py-2.5">
-            <span className="flex items-center gap-1 text-[#f0d59b]" aria-hidden>
-              {"★★★★★".split("").map((s, i) => (
-                <span key={i} className={i === 4 ? "opacity-60" : ""}>{s}</span>
-              ))}
-            </span>
-            <span className="font-sans text-[14px] font-semibold text-[#f5ead4]">4.6</span>
-            <span className="font-sans text-[13px] text-[#a99c8b]">loved by our readers</span>
+          {/* Reader social proof — real numbers: 25 five-star reviews, 1,000+ readers. */}
+          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full border border-[rgba(210,163,95,.35)] bg-[rgba(210,163,95,.08)] px-5 py-2.5">
+            <span className="tracking-tight text-[#f0d59b]" aria-hidden>★★★★★</span>
+            <span className="font-sans text-[14px] font-semibold text-[#f5ead4]">25 five-star reviews</span>
+            <span className="hidden text-[#6f665a] sm:inline">·</span>
+            <span className="font-sans text-[13px] text-[#a99c8b]">read by 1,000+</span>
           </div>
         </div>
       </div>
