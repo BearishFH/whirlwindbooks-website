@@ -6,8 +6,24 @@ import { NextResponse, type NextRequest } from "next/server"
  * cookies in sync between the browser and the server. Also guards the app
  * routes: unauthenticated users hitting an app route are sent to /login.
  */
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders?: Headers,
+) {
+  // Forward these headers to the app (carry the CSP nonce set in middleware.ts).
+  // Kept in sync with any refreshed auth cookies below so Server Components see
+  // both the nonce and the latest session.
+  const baseHeaders = requestHeaders ?? new Headers(request.headers)
+  const syncCookieHeader = () =>
+    baseHeaders.set(
+      "cookie",
+      request.cookies
+        .getAll()
+        .map((c) => `${c.name}=${c.value}`)
+        .join("; "),
+    )
+
+  let supabaseResponse = NextResponse.next({ request: { headers: baseHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +37,8 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           )
-          supabaseResponse = NextResponse.next({ request })
+          syncCookieHeader()
+          supabaseResponse = NextResponse.next({ request: { headers: baseHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           )
