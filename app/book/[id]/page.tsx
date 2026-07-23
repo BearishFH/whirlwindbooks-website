@@ -18,7 +18,30 @@ export const dynamic = "force-dynamic"
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const book = await getBook(id)
-  return { title: book ? `${localisedTitle(book)} — Whirlwind` : "Whirlwind" }
+  if (!book) return { title: "Book" }
+  const title = localisedTitle(book)
+  const description = localisedDescription(book).slice(0, 160).trim()
+  const cover = coverUrl(book)
+  const url = `https://whirlwindbooks.com/book/${id}`
+  return {
+    // Root template appends " — Whirlwind".
+    title,
+    description,
+    alternates: { canonical: `/book/${id}` },
+    openGraph: {
+      title: `${title} — Whirlwind`,
+      description,
+      type: "book",
+      url,
+      images: cover ? [{ url: cover, width: 800, height: 1200, alt: title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: cover ? [cover] : undefined,
+    },
+  }
 }
 
 export default async function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
