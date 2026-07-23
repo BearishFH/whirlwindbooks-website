@@ -104,14 +104,34 @@ export default async function SubscribePage() {
           <section className="relative z-10 mx-auto max-w-5xl px-5 pb-4 pt-6 md:px-8">
             <div className="grid gap-6 md:grid-cols-3">
               <Feature
+                icon={
+                  <>
+                    <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5v-12Z" />
+                    <path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 0 1.5-1.5v-12Z" />
+                  </>
+                }
                 title="Read or listen"
                 body="Every story in polished prose and rich narration. Switch between them without losing your place."
               />
               <Feature
+                icon={
+                  <>
+                    <path d="M4 14v-2a8 8 0 0 1 16 0v2" />
+                    <rect x="3" y="13" width="4" height="7" rx="1.5" />
+                    <rect x="17" y="13" width="4" height="7" rx="1.5" />
+                  </>
+                }
                 title="New mysteries weekly"
                 body="Fresh whodunits, thrillers and noir land every week. Your next obsession is always waiting."
               />
               <Feature
+                icon={
+                  <>
+                    <rect x="3" y="5" width="13" height="10" rx="1.5" />
+                    <rect x="16" y="9" width="5" height="10" rx="1.5" />
+                    <path d="M7 19h6" />
+                  </>
+                }
                 title="One membership, everywhere"
                 body="Buy once on the web and it unlocks the iPhone app too — your library and progress follow you."
               />
@@ -149,10 +169,22 @@ export default async function SubscribePage() {
   )
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6 text-left backdrop-blur-sm">
-      <div className="mb-3 h-8 w-8 rounded-full border border-[rgba(210,163,95,.4)] bg-[rgba(210,163,95,.1)]" />
+      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-[rgba(210,163,95,.4)] bg-[rgba(210,163,95,.1)]">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="#f0d59b"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {icon}
+        </svg>
+      </div>
       <h3 className="ww-display text-lg text-[#f5ead4]">{title}</h3>
       <p className="mt-2 font-serif text-[15px] leading-relaxed text-[#a99c8b]">{body}</p>
     </div>
