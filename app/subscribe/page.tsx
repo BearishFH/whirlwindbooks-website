@@ -61,10 +61,12 @@ export default async function SubscribePage() {
       {/* ─── Hero: the cover wall + the offer ─── */}
       <section className="relative min-h-[100svh] overflow-hidden">
         <CoverMarquee rows={rows} />
-        {/* Legibility scrims: darken + vignette + fade to page below */}
-        <div className="absolute inset-0 bg-[#060508]/78" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,5,8,.35)_0%,rgba(6,5,8,.9)_72%,#060508_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#060508]" />
+        {/* Legibility scrims: light overall wash so covers stay vivid, a vignette
+            that darkens behind the headline and at the edges, plus a fade into
+            the page below. */}
+        <div className="absolute inset-0 bg-[#060508]/35" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_70%_at_50%_40%,rgba(6,5,8,.62)_0%,rgba(6,5,8,.1)_50%,rgba(6,5,8,.9)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-[#060508]" />
 
         <main className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pb-24 pt-28 text-center md:pt-32">
           {subscribed ? (
@@ -72,12 +74,12 @@ export default async function SubscribePage() {
           ) : (
             <>
               <p className="ww-eyebrow mb-4">Whirlwind Unlimited</p>
-              <h1 className="ww-display text-[42px] font-medium leading-[1.05] text-[#f7ecd6] md:text-6xl">
+              <h1 className="ww-display text-[42px] font-medium leading-[1.05] text-[#f7ecd6] [text-shadow:0_2px_40px_rgba(0,0,0,.95)] md:text-6xl">
                 Every mystery,
                 <br />
                 <span className="text-[#f0d59b]">unlocked.</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-xl font-serif text-[17px] leading-relaxed text-[#d9cbb5] md:text-[19px]">
+              <p className="mx-auto mt-6 max-w-xl font-serif text-[17px] leading-relaxed text-[#d9cbb5] [text-shadow:0_1px_24px_rgba(0,0,0,.95)] md:text-[19px]">
                 The full library to read or listen — a new snackable mystery every week. One
                 membership covers the web and the iOS app. Cancel anytime.
               </p>
