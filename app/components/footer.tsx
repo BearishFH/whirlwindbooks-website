@@ -5,6 +5,7 @@ import { APP_STORE_URL } from "@/lib/links"
 const LEGAL = [
   { href: "/terms", label: "Terms of Service" },
   { href: "/privacy", label: "Privacy Policy" },
+  { href: "/refund", label: "Refund Policy" },
   { href: "/eu-data", label: "EU Data Policy" },
   { href: "/contact", label: "Contact" },
 ]

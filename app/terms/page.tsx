@@ -108,11 +108,24 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-serif font-medium text-gold mb-4">6. Subscriptions & Billing</h2>
               <p className="text-soft-ivory/90 mb-4 leading-relaxed">
-                Subscriptions auto-renew unless canceled at least 24 hours before the end of the current period. Billing
-                is handled via the Apple App Store. We do not process payments directly.
+                Subscriptions auto-renew until cancelled. Where you subscribe determines who processes your payment:
               </p>
+              <ul className="list-disc list-inside text-soft-ivory/90 mb-4 space-y-2 leading-relaxed">
+                <li>
+                  On the web (whirlwindbooks.com), payments are processed by Paddle.com Market Limited, our authorised
+                  reseller and Merchant of Record. Applicable taxes (such as VAT) are calculated and collected at checkout.
+                </li>
+                <li>
+                  In the iOS app, billing is handled by the Apple App Store. To cancel an App Store subscription, visit
+                  your Apple account settings.
+                </li>
+              </ul>
               <p className="text-soft-ivory/90 leading-relaxed">
-                To cancel a subscription, visit your Apple account settings.
+                For cancellations and refunds, see our{" "}
+                <Link href="/refund" className="text-gold hover:text-ivory underline">
+                  Refund Policy
+                </Link>
+                .
               </p>
             </section>
 
