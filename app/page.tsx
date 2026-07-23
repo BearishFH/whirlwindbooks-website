@@ -4,12 +4,14 @@ import Header from "./components/header"
 import HeroSection from "./components/hero-section"
 import HowItWorks from "./components/how-it-works"
 import FeaturedSeries from "./components/featured-series"
+import { OriginalsShowcase } from "./components/originals-showcase"
 import ReadOrListen from "./components/read-or-listen"
 import StoryWorlds from "./components/story-worlds"
 import Manifesto from "./components/manifesto"
 import AppCTA from "./components/app-cta"
 import Footer from "./components/footer"
 import MysteryParticles from "./components/mystery-particles"
+import { StructuredData } from "./components/structured-data"
 
 export const dynamic = "force-dynamic"
 
@@ -23,6 +25,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen bg-[#0a0909]">
+      <StructuredData />
       <MysteryParticles />
       <div aria-hidden="true" className="ww-grain" />
 
@@ -32,6 +35,7 @@ export default async function HomePage() {
           <HeroSection />
           <HowItWorks />
           <FeaturedSeries />
+          <OriginalsShowcase />
           <ReadOrListen />
           <StoryWorlds />
           <Manifesto />
