@@ -277,7 +277,7 @@ export function Reader({
                   English audiobook — your subscription works in the app and on the web.
                 </p>
                 <a
-                  href="/account"
+                  href="/subscribe"
                   className="mt-6 inline-block rounded-full px-7 py-3 font-sans text-sm font-semibold"
                   style={{ background: "#D4A843", color: "#0a0909" }}
                 >

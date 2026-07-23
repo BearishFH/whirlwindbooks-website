@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { hasActiveSubscription } from "@/lib/entitlement"
 import { AppNav } from "@/components/app/app-nav"
 
 export const metadata = { title: "Account — Whirlwind" }
@@ -12,6 +13,8 @@ export default async function AccountPage() {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect("/login?redirect=/account")
+
+  const subscribed = await hasActiveSubscription(user.id, supabase)
 
   const provider = user.app_metadata?.provider ?? "account"
   const name =
@@ -49,7 +52,13 @@ export default async function AccountPage() {
               </Link>
             </Row>
             <Row label="Subscription">
-              <span className="text-[#a99c8b]">Managed in the Whirlwind iOS app</span>
+              {subscribed ? (
+                <span className="font-semibold text-[#7bbf8a]">Active · all books unlocked</span>
+              ) : (
+                <Link href="/subscribe" className="text-[#f0d59b] hover:underline">
+                  Subscribe
+                </Link>
+              )}
             </Row>
             <Row label="Terms & Privacy">
               <span className="flex gap-3">

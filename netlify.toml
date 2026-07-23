@@ -7,6 +7,10 @@
   # Public client keys (safe to expose — same anon key the iOS app ships). The
   # RevenueCat SECRET key is intentionally NOT here; set REVENUECAT_SECRET_KEY in
   # the Netlify UI (server-only) to enable cross-platform entitlement checks.
+  #
+  # Web checkout: once the RevenueCat Web Billing app is created, set its PUBLIC
+  # key as NEXT_PUBLIC_RC_WEB_BILLING_KEY (publishable — like a Stripe pk_, safe
+  # to expose). Until it is set, /subscribe falls back to "subscribe in the app".
   NEXT_PUBLIC_SUPABASE_URL = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbXFocHVoanFib21ycHV1b3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3MjA0NDgsImV4cCI6MjA2MzI5NjQ0OH0.NThXXKetrK2iPAENglmzJB8tuIXxEZoMqK1--jXWeWA"
 
