@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/server"
+import { safeRedirectPath } from "@/lib/safe-redirect"
 import { LoginButtons } from "./login-buttons"
 
 export const metadata = {
@@ -23,7 +24,7 @@ export default async function LoginPage({
     data: { user },
   } = await supabase.auth.getUser()
   if (user && !user.is_anonymous) {
-    redirect(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/browse")
+    redirect(safeRedirectPath(redirectTo))
   }
 
   return (
