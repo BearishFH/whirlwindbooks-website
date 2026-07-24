@@ -2,26 +2,26 @@ import Reveal from "./reveal"
 
 const WORLDS = [
   {
-    art: "/lucien-new.png",
-    artAlt: "Illustrated character artwork from the Whirlwind mystery series",
+    art: "/covers/the-cyprus-agenda.jpg",
+    artAlt: "Cover of The Cyprus Agenda, an original Whirlwind mystery",
     kicker: "The cold side",
     title: "Heists, forgeries and very expensive secrets",
     body: "Villas above the sea, unmarked couriers, files that were never supposed to exist. Stories where everyone at the table is running a second agenda.",
     quote:
       "There are only twelve bottles like it in the world. Tonight, I'm stealing the one that could topple governments.",
     source: "The Cyprus Agenda",
-    position: "object-[50%_18%]",
+    position: "object-top",
   },
   {
-    art: "/thea-new.png",
-    artAlt: "Illustrated character artwork from the Whirlwind mystery series",
+    art: "/covers/death-by-golden-honey-spirals.jpg",
+    artAlt: "Cover of Death by Golden Honey Spirals, an original Whirlwind mystery",
     kicker: "The warm side",
     title: "Murder with the kettle still on",
     body: "Kitchens, weddings, family houses with seventy years of history in the walls. The danger sits at the table and compliments the pastries.",
     quote:
       "The diplomat was going to die in exactly seventeen minutes, and Theodora Papadakis was humming while she arranged the final tray of pastries.",
     source: "Death by Golden Honey Spirals",
-    position: "object-[50%_15%]",
+    position: "object-top",
   },
 ]
 

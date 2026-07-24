@@ -11,10 +11,10 @@ export default function HeroSection() {
       {/* atmospheric character wash */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <img
-          src="/lucien-new.png"
+          src="/covers/the-cyprus-agenda.jpg"
           alt=""
           aria-hidden="true"
-          className="h-full w-full scale-105 object-cover object-[72%_center] brightness-[.45] saturate-[.8] md:object-[65%_center] md:brightness-[.55] md:saturate-[.85]"
+          className="h-full w-full scale-110 object-cover object-center brightness-[.4] saturate-[.85] blur-[3px] md:brightness-[.48]"
         />
         <div
           className="absolute inset-0"
@@ -42,28 +42,28 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a
-              href={APP_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ww-btn ww-btn-gold w-full sm:w-auto"
-            >
-              <svg viewBox="0 0 384 512" fill="currentColor" className="h-[18px] w-[18px]" aria-hidden="true">
-                <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-              </svg>
-              Get it on the App Store
-            </a>
-            <a href="#featured-series" className="ww-btn ww-btn-ghost w-full sm:w-auto">
-              Browse the mysteries
+            <a href="/browse" className="ww-btn ww-btn-gold w-full sm:w-auto">
+              Start reading free
               <svg viewBox="0 0 24 24" fill="none" className="h-[18px] w-[18px]" aria-hidden="true">
                 <path
-                  d="M12 5v14M6 13l6 6 6-6"
+                  d="M5 12h14M13 6l6 6-6 6"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
+            </a>
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ww-btn ww-btn-ghost w-full sm:w-auto"
+            >
+              <svg viewBox="0 0 384 512" fill="currentColor" className="h-[18px] w-[18px]" aria-hidden="true">
+                <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+              </svg>
+              Get the iOS app
             </a>
           </div>
 
@@ -92,10 +92,12 @@ export default function HeroSection() {
           <div className="ww-phone">
             <div className="ww-phone-screen">
               <div className="ww-reader-top">
-                <img src="/lucien-new.png" alt="" aria-hidden="true" />
+                <img src="/covers/the-cyprus-agenda.jpg" alt="" aria-hidden="true" />
                 <div className="ww-reader-meta">
-                  <small>Book one</small>
-                  <p className="ww-display mt-1.5 text-[28px] leading-none md:text-[31px]">Lucien</p>
+                  <small>Featured mystery</small>
+                  <p className="ww-display mt-1.5 text-[26px] leading-none md:text-[29px]">
+                    The Cyprus Agenda
+                  </p>
                 </div>
               </div>
               <div className="ww-reader-body">
@@ -103,26 +105,24 @@ export default function HeroSection() {
                   Chapter one
                 </div>
                 <p className="ww-display my-2 text-[22px] leading-tight text-[#2c2520] md:text-[24px]">
-                  The Blue Ledger
+                  Twelve bottles
                 </p>
                 <p>
-                  By the time the lights returned, the painting was still on the wall.
-                  The man beside it was not.
+                  There are only twelve bottles like it in the world. Tonight, I&rsquo;m
+                  stealing the one that could topple governments.
                 </p>
                 <p className="mt-2">
-                  Lucien smiled at the empty frame. Someone had finally learned how he
-                  liked to be invited.
+                  The other eleven are accounted for — museums, vaults, a sultan&rsquo;s
+                  cellar no one has opened in thirty years.
                 </p>
               </div>
             </div>
           </div>
 
           <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/browse"
             className="ww-audio"
-            aria-label="Listen to Whirlwind stories in the app on the App Store"
+            aria-label="Start reading Whirlwind mysteries"
           >
             <span aria-hidden="true" className="ww-audio-ring" />
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-[24px] md:w-[26px]" aria-hidden="true">
