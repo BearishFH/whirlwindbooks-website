@@ -145,7 +145,7 @@ export default async function SubscribePage() {
               Start reading in under a minute
             </h2>
             <p className="mx-auto mt-3 max-w-md font-serif text-[15px] leading-relaxed text-[#a99c8b]">
-              Secure checkout handled by Paddle — taxes included, cancel whenever you like.
+              Secure checkout handled by Stripe — taxes handled at checkout, cancel whenever you like.
             </p>
             <p className="mx-auto mt-8 max-w-md font-sans text-[12px] leading-relaxed text-[#6f665a]">
               By subscribing you agree to our{" "}

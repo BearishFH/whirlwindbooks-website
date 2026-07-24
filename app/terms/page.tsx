@@ -112,8 +112,8 @@ export default function TermsPage() {
               </p>
               <ul className="list-disc list-inside text-soft-ivory/90 mb-4 space-y-2 leading-relaxed">
                 <li>
-                  On the web (whirlwindbooks.com), payments are processed by Paddle.com Market Limited, our authorised
-                  reseller and Merchant of Record. Applicable taxes (such as VAT) are calculated and collected at checkout.
+                  On the web (whirlwindbooks.com), payments are processed by Stripe, our payment processor and
+                  merchant of record. Applicable taxes (such as VAT) are calculated and collected at checkout.
                 </li>
                 <li>
                   In the iOS app, billing is handled by the Apple App Store. To cancel an App Store subscription, visit

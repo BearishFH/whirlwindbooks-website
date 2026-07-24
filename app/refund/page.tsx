@@ -52,8 +52,8 @@ export default function RefundPage() {
               <ul className="list-disc list-inside text-soft-ivory/90 mb-4 space-y-2 leading-relaxed">
                 <li>
                   <strong className="text-soft-ivory">On the web (whirlwindbooks.com):</strong> payments
-                  are processed by Paddle.com Market Limited, our authorised reseller and Merchant of
-                  Record. Refund requests for web subscriptions are handled by us together with Paddle.
+                  are processed by Stripe, our payment processor and merchant of record. Refund requests
+                  for web subscriptions are handled by us.
                 </li>
                 <li>
                   <strong className="text-soft-ivory">In the iOS app (Apple App Store):</strong> Apple is
@@ -113,7 +113,7 @@ export default function RefundPage() {
                   <Link href="/account" className="text-gold hover:text-ivory underline">
                     Account
                   </Link>{" "}
-                  page, or via the management link in your Paddle receipt email.
+                  page, or via the management link in your Stripe receipt email.
                 </li>
                 <li>
                   <strong className="text-soft-ivory">iOS:</strong> cancel in your Apple ID subscription
@@ -125,14 +125,14 @@ export default function RefundPage() {
             <section>
               <h2 className="text-2xl font-serif font-medium text-gold mb-4">6. How to request a refund</h2>
               <p className="text-soft-ivory/90 mb-2 leading-relaxed">
-                For web (Paddle) purchases, email us and we will respond within 5 business days:
+                For web (Stripe) purchases, email us and we will respond within 5 business days:
               </p>
               <p className="text-soft-ivory/90 mb-4 leading-relaxed">
                 📧 support@bearishfh.com | Subject: Whirlwind Refund
               </p>
               <p className="text-soft-ivory/90 leading-relaxed">
-                Please include the email address used at checkout and your Paddle order or receipt number.
-                You may also contact Paddle directly via the receipt they email you after purchase.
+                Please include the email address used at checkout and your Stripe order or receipt number.
+                You can also manage your subscription via the link in the receipt emailed to you after purchase.
               </p>
             </section>
 

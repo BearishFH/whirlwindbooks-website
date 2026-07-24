@@ -4,21 +4,23 @@ import { updateSession } from "@/lib/supabase/middleware"
 const SUPABASE = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
 const SUPABASE_WS = "wss://zpmqhpuhjqbomrpuuoye.supabase.co"
 const REVENUECAT = "https://*.revenuecat.com https://*.rev.cat"
-const PADDLE = "https://*.paddle.com https://*.paddlecdn.com"
+// RevenueCat Web Billing settles through Stripe (Managed Payments), so the
+// hosted checkout embeds Stripe.js and its 3-D Secure / fraud endpoints.
+const STRIPE = "https://*.stripe.com https://*.stripe.network"
 
 // Per-request nonce lets us drop 'unsafe-inline' from script-src: only Next's
 // own scripts (which get this nonce) and scripts they load ('strict-dynamic')
-// run. 'unsafe-eval' is kept because the Paddle/RevenueCat checkout SDK needs
+// run. 'unsafe-eval' is kept because the Stripe/RevenueCat checkout SDK needs
 // it. Styles keep 'unsafe-inline' (framework-injected, low risk).
 function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' ${PADDLE} https:`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' ${STRIPE} https:`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${SUPABASE} ${PADDLE}`,
+    `img-src 'self' data: blob: ${SUPABASE} ${STRIPE}`,
     `media-src 'self' blob: ${SUPABASE}`,
-    `connect-src 'self' ${SUPABASE} ${SUPABASE_WS} ${REVENUECAT} ${PADDLE}`,
-    `frame-src 'self' ${REVENUECAT} ${PADDLE}`,
+    `connect-src 'self' ${SUPABASE} ${SUPABASE_WS} ${REVENUECAT} ${STRIPE}`,
+    `frame-src 'self' ${REVENUECAT} ${STRIPE}`,
     "worker-src 'self' blob:",
     "font-src 'self' data:",
     "frame-ancestors 'none'",
