@@ -18,6 +18,26 @@
   --ww-serif: var(--font-inria-serif), "Iowan Old Style", Palatino, Georgia, serif;
 }
 
+/* ============================================================
+   READER FONTS — choices offered in the reader's type menu.
+   next/font sets --font-* on <html>; OpenDyslexic is self-hosted.
+   ============================================================ */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/OpenDyslexic-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  --read-spectral: var(--font-spectral), "Iowan Old Style", Georgia, serif;
+  --read-crimson: var(--font-crimson), Georgia, serif;
+  --read-cormorant: var(--font-cormorant), Georgia, serif;
+  --read-inria: var(--font-inria-serif), Georgia, serif;
+  --read-sans: var(--font-inter), system-ui, sans-serif;
+  --read-dyslexic: "OpenDyslexic", Verdana, sans-serif;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

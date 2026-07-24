@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inria_Serif, Inter } from "next/font/google"
+import { Inria_Serif, Inter, Spectral, Crimson_Pro, Cormorant_Garamond } from "next/font/google"
 import "./globals.css"
 
 const inriaSerif = Inria_Serif({
@@ -13,6 +13,29 @@ const inriaSerif = Inria_Serif({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+})
+
+// Reader font choices (matches the iOS app's typography options). Self-hosted by
+// next/font at build time — no runtime external requests, so CSP stays clean.
+const spectral = Spectral({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-spectral",
+  display: "swap",
+})
+
+const crimson = Crimson_Pro({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-crimson",
+  display: "swap",
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-cormorant",
   display: "swap",
 })
 
@@ -73,7 +96,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inriaSerif.variable} ${inter.variable} scroll-smooth`}>
+    <html
+      lang="en"
+      className={`${inriaSerif.variable} ${inter.variable} ${spectral.variable} ${crimson.variable} ${cormorant.variable} scroll-smooth`}
+    >
       <body className="overflow-x-hidden bg-[#0a0909] font-serif text-[#f5ead4] antialiased">
         {children}
       </body>

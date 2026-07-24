@@ -64,6 +64,7 @@ export default async function ReadPage({
       bookId={book.id}
       title={title}
       author={book.author?.name ?? null}
+      cover={coverUrl(book)}
       chapters={chapters}
       audioSrc={audioSrc}
       startInListen={mode === "listen"}
