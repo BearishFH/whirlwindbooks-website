@@ -23,13 +23,29 @@ export async function fetchBookText(url: string): Promise<string> {
 
 const CHAPTER_RE = /^\s*(chapter\s+[\divxlc]+|prologue|epilogue)\b.*$/i
 
+// A markdown Table-of-Contents line: a list item whose whole content is a link,
+// e.g. "- [Chapter 2: Blood and Power](#chapter-2-blood-and-power)". These must
+// be removed BEFORE anything else: they render as raw syntax, and — critically —
+// a "Chapter 2" paid-marker `indexOf` would match the TOC link instead of the
+// real chapter, cutting the free preview off inside the table of contents.
+const TOC_LINE_RE = /^\s*[-*]\s*\[[^\]]+\]\([^)]*\)\s*$/
+
+/** Strip the markdown TOC block so it never pollutes the reader or the marker search. */
+export function stripToc(text: string): string {
+  return text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .filter((line) => !TOC_LINE_RE.test(line))
+    .join("\n")
+}
+
 /**
  * Split plain book text into chapters. Recognises lines that begin with
  * "Chapter N" (also Prologue / Epilogue). If no markers are present the whole
  * text becomes a single chapter so the reader never comes up empty.
  */
 export function splitIntoChapters(text: string): Chapter[] {
-  const normalised = text.replace(/\r\n/g, "\n").trim()
+  const normalised = stripToc(text).trim()
   if (!normalised) return []
 
   const lines = normalised.split("\n")
@@ -41,6 +57,7 @@ export function splitIntoChapters(text: string): Chapter[] {
     if (/^\s*([-*_]\s*){3,}$/.test(rawLine)) continue // horizontal rule
     const line = rawLine
       .replace(/^\s*#{1,6}\s+/, "") // heading hashes -> plain text
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // markdown links -> just the text
       .replace(/\*\*|__/g, "") // bold
       .replace(/`/g, "") // inline code ticks
 
@@ -88,18 +105,29 @@ function finalise(c: { heading: string; body: string[] }, index: number): Chapte
  * never served. Full chapters are only ever returned to a subscribed user.
  */
 export function freePreview(rawText: string, paidStartingText: string | null): Chapter[] {
-  // Prefer the explicit paid boundary (everything before it is free).
+  // Work on TOC-stripped text so neither the display nor the marker search is
+  // polluted by table-of-contents links.
+  const clean = stripToc(rawText)
+  const chapters = splitIntoChapters(clean)
+  if (chapters.length === 0) return []
+
+  // When the book has real chapter breaks, the free unit is the FIRST chapter —
+  // full — matching the iOS app's freeFirstChapter. This is deliberately robust
+  // to a mis-set paid marker (the reason Cyprus was cutting off in its TOC): we
+  // wall at the start of Chapter 2, not wherever a fragile string match lands.
+  if (chapters.length >= 2) return [chapters[0]]
+
+  // No chapter markers at all: never serve the whole (paid) body. Cut at the
+  // paid marker if it's sane, else a char cap, on a paragraph boundary.
   const marker = paidStartingText?.trim()
-  if (marker) {
-    const idx = rawText.indexOf(marker)
-    if (idx > 0) return splitIntoChapters(rawText.slice(0, idx))
-  }
-  // Otherwise cap to ~the first chapter's worth of text (matches the iOS
-  // ~14k-char free cap), cut on a paragraph boundary so it never dumps the
-  // paid body but still reads as a complete opening.
   const CAP = 14000
-  if (rawText.length <= CAP) return splitIntoChapters(rawText)
-  let cut = rawText.lastIndexOf("\n\n", CAP)
-  if (cut < CAP * 0.5) cut = CAP
-  return splitIntoChapters(rawText.slice(0, cut))
+  let bound = CAP
+  if (marker) {
+    const idx = clean.indexOf(marker)
+    if (idx > 400) bound = Math.min(idx, CAP)
+  }
+  if (clean.length <= bound) return chapters
+  let cut = clean.lastIndexOf("\n\n", bound)
+  if (cut < bound * 0.5) cut = bound
+  return splitIntoChapters(clean.slice(0, cut))
 }
