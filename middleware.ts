@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
+import { FREE_BOOK_COOKIE } from "@/lib/free-book"
 
 const SUPABASE = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
 const SUPABASE_WS = "wss://zpmqhpuhjqbomrpuuoye.supabase.co"
@@ -46,6 +47,20 @@ export async function middleware(request: NextRequest) {
 
   const response = await updateSession(request, requestHeaders)
   response.headers.set("content-security-policy", csp)
+
+  // One-free-story funnel: the FIRST book a visitor actually opens in the reader
+  // is claimed here. The read page walls any *other* book for non-subscribers,
+  // so free readers commit to one story + its cliffhanger instead of grazing
+  // every Chapter 1. Set once, never overwritten; subscribers are never walled.
+  const readMatch = request.nextUrl.pathname.match(/^\/read\/([^/]+)/)
+  if (readMatch && !request.cookies.get(FREE_BOOK_COOKIE)) {
+    response.cookies.set(FREE_BOOK_COOKIE, decodeURIComponent(readMatch[1]), {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      httpOnly: true,
+      sameSite: "lax",
+    })
+  }
   return response
 }
 
