@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache"
+
 // Reader helpers. Book bodies are plain-text (UTF-8) files stored in Supabase
 // Storage, referenced by book_contents.content_url — exactly what the iOS app
 // downloads (see BookPreferenceViewModal.downloadText). We fetch that text
@@ -10,15 +12,29 @@ export type Chapter = {
   paragraphs: string[]
 }
 
-/** Download the raw book text. Returns "" on any failure (never throws). */
-export async function fetchBookText(url: string): Promise<string> {
+async function downloadBookText(url: string): Promise<string> {
   try {
-    const res = await fetch(url, { cache: "no-store" })
+    // 6s timeout so a slow Storage response can't pin a serverless function
+    // during a traffic spike.
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) })
     if (!res.ok) return ""
     return await res.text()
   } catch {
     return ""
   }
+}
+
+/**
+ * Download the raw book text. Book bodies are immutable files, so the result is
+ * cached by URL: 100k reads of the same title become ONE download + parse, not
+ * 100k (the single biggest cost/latency lever under paid traffic). Returns ""
+ * on any failure (never throws).
+ */
+export function fetchBookText(url: string): Promise<string> {
+  if (!url) return Promise.resolve("")
+  return unstable_cache(() => downloadBookText(url), ["book-text", url], {
+    revalidate: 86400,
+  })()
 }
 
 const CHAPTER_RE = /^\s*(chapter\s+[\divxlc]+|prologue|epilogue)\b.*$/i

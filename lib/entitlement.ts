@@ -31,6 +31,9 @@ export async function hasActiveSubscription(
         {
           headers: { Authorization: `Bearer ${RC_SECRET}` },
           cache: "no-store",
+          // Don't let a slow RevenueCat pin the request during a traffic spike;
+          // on timeout we fall through to the table, then secure-default deny.
+          signal: AbortSignal.timeout(3000),
         },
       )
       if (res.ok) {

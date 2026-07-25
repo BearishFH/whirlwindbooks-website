@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { safeRedirectPath } from "@/lib/safe-redirect"
 
 /**
  * OAuth (PKCE) redirect target. Supabase sends the browser here with a `code`
@@ -12,8 +13,8 @@ import { createClient } from "@/lib/supabase/server"
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const redirectParam = searchParams.get("redirect")
-  const next = redirectParam && redirectParam.startsWith("/") ? redirectParam : "/browse"
+  // Reject protocol-relative ("//evil.com") / "/\evil.com" open-redirect payloads.
+  const next = safeRedirectPath(searchParams.get("redirect"), "/browse")
 
   if (code) {
     const supabase = await createClient()

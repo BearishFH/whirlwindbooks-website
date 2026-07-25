@@ -62,7 +62,13 @@ export async function updateSession(
     (p) => pathname === p || pathname.startsWith(p + "/"),
   )
 
-  if (!user && isAppRoute) {
+  // Only auto-create an anonymous account when we still depend on the user-scoped
+  // RLS client to read the catalogue. Once `SUPABASE_SERVICE_ROLE_KEY` is set,
+  // catalogue + content reads go through the server-only admin client, so
+  // browsing/reading needs NO session — and we stop minting a permanent anonymous
+  // user (a row in auth.users) on every visit, e.g. every Meta-ad click. Login
+  // still creates a real session; the reader treats no-session as a free reader.
+  if (!user && isAppRoute && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     // No login wall — mirror the iOS app: give the visitor a silent anonymous
     // account so they can browse and read the free first chapter immediately.
     // Redirect to the same URL so the new session cookies apply before render.

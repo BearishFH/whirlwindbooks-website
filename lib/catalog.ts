@@ -1,5 +1,18 @@
+import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
+import { adminClient } from "@/lib/supabase/admin"
 import type { AppSection, Book } from "@/lib/catalog-types"
+
+// Public catalogue reads go through the server-only service-role client when it
+// is configured (`SUPABASE_SERVICE_ROLE_KEY`). That lets us lock RLS so the
+// public REST API exposes nothing sensitive (content URLs, unpublished books)
+// and means browsing/reading no longer needs a per-visitor anonymous session.
+// Until the key is set it falls back to the user-scoped RLS client (current
+// behaviour). NEVER use this for another user's private rows — see getMyBooks,
+// which stays user-scoped on purpose.
+async function readClient() {
+  return adminClient() ?? (await createClient())
+}
 
 // Mirrors SupabaseManager.bookSelectQuery() in the iOS app.
 const BOOK_SELECT = `
@@ -27,7 +40,7 @@ const BOOK_SELECT = `
  * app_section_books join table.
  */
 export async function getHomeSections(): Promise<AppSection[]> {
-  const supabase = await createClient()
+  const supabase = await readClient()
   const { data, error } = await supabase
     .from("app_sections")
     .select(
@@ -56,7 +69,7 @@ export async function getHomeSections(): Promise<AppSection[]> {
 
 /** All published books, newest first — used for the "Every mystery" grid. */
 export async function getAllBooks(limit = 100): Promise<Book[]> {
-  const supabase = await createClient()
+  const supabase = await readClient()
   const { data, error } = await supabase
     .from("books")
     .select(BOOK_SELECT)
@@ -71,13 +84,19 @@ export async function getAllBooks(limit = 100): Promise<Book[]> {
   return (data as unknown as Book[]) ?? []
 }
 
-/** Single book by id. Mirrors SupabaseManager.fetchBook. */
-export async function getBook(bookId: string): Promise<Book | null> {
-  const supabase = await createClient()
+/**
+ * Single book by id. `cache()`-memoised so the metadata + page-body calls in the
+ * same request collapse to one query. Only PUBLISHED books resolve — an
+ * unpublished/embargoed id returns null (defence-in-depth alongside the RLS fix),
+ * so drafts can't be pulled by guessing an id.
+ */
+export const getBook = cache(async (bookId: string): Promise<Book | null> => {
+  const supabase = await readClient()
   const { data, error } = await supabase
     .from("books")
     .select(BOOK_SELECT)
     .eq("id", bookId)
+    .eq("is_published", true)
     .limit(1)
 
   if (error) {
@@ -85,7 +104,7 @@ export async function getBook(bookId: string): Promise<Book | null> {
     return null
   }
   return ((data as unknown as Book[]) ?? [])[0] ?? null
-}
+})
 
 export type MyBookRow = {
   id: string
@@ -133,7 +152,7 @@ export async function getMyBooks(): Promise<MyBookRow[]> {
 
 /** Same-genre recommendations (excludes the current book). */
 export async function getSimilarBooks(book: Book, limit = 12): Promise<Book[]> {
-  const supabase = await createClient()
+  const supabase = await readClient()
   const { data, error } = await supabase
     .from("books")
     .select(BOOK_SELECT)
