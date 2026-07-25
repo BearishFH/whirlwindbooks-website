@@ -82,7 +82,21 @@ export function SubscribePlans({ initialUserId }: { initialUserId: string | null
         const { Purchases } = await import("@revenuecat/purchases-js")
         const purchases = Purchases.configure({ apiKey: RC_KEY, appUserId: uid })
         const offerings = await purchases.getOfferings()
-        const pkgs = offerings.current?.availablePackages ?? []
+        // Resolve the offering robustly: the project "current" pointer isn't
+        // always set for the web (Stripe) app, so fall back to the named
+        // "subscriptions" offering, then to any offering that actually has
+        // purchasable web packages.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const all: Record<string, any> = offerings.all ?? {}
+        const offering =
+          (offerings.current && offerings.current.availablePackages.length > 0
+            ? offerings.current
+            : null) ??
+          (all.subscriptions?.availablePackages?.length ? all.subscriptions : null) ??
+          Object.values(all).find((o) => (o?.availablePackages?.length ?? 0) > 0) ??
+          offerings.current ??
+          null
+        const pkgs = offering?.availablePackages ?? []
 
         if (cancelled) return
 
