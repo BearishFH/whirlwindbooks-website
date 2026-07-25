@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { hasActiveSubscription } from "@/lib/entitlement"
 import { getAllBooks } from "@/lib/catalog"
@@ -38,13 +37,11 @@ export default async function SubscribePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // A purchase must attach to a REAL account (email/Apple/Google), not an
-  // anonymous guest — otherwise it can't follow the reader to the iOS app.
-  if (!user || user.is_anonymous) {
-    redirect("/login?redirect=/subscribe")
-  }
-
-  const subscribed = await hasActiveSubscription(user.id, supabase)
+  // Pay-first: guests can subscribe WITHOUT an account. The checkout gives them
+  // a silent session, they pay, and the account is created AFTER payment (see
+  // SubscribePlans → PostPurchase). We only check entitlement if a session
+  // already exists.
+  const subscribed = user ? await hasActiveSubscription(user.id, supabase) : false
 
   // Build the cover wall from the real catalogue, padded with local covers so
   // every row is full and seamless.
@@ -56,7 +53,7 @@ export default async function SubscribePage() {
 
   return (
     <div className="min-h-screen bg-[#060508]">
-      <AppNav email={user.email} />
+      <AppNav email={user?.email} />
 
       {/* ─── Hero: the cover wall + the offer ─── */}
       <section className="relative min-h-[100svh] overflow-hidden">
@@ -87,7 +84,7 @@ export default async function SubscribePage() {
               </p>
 
               <div className="mt-10 w-full">
-                <SubscribePlans appUserId={user.id} />
+                <SubscribePlans initialUserId={user?.id ?? null} />
               </div>
 
               <p className="mt-6 font-sans text-[12px] text-[#7c7060]">

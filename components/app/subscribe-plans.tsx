@@ -1,34 +1,29 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { trackMeta } from "@/lib/meta-pixel"
 
-// RevenueCat Web SDK checkout. This mirrors the iOS paywall: the visitor picks
-// a plan, RevenueCat presents the hosted checkout (settled through Stripe via
-// RevenueCat Managed Payments — Stripe handles global tax/VAT), and on success
-// the entitlement is live on RevenueCat — which the server-side
-// `hasActiveSubscription()` reads, so reading unlocks on web AND in the app.
-//
-// The same purchase() flow and the same public key work regardless of the
-// underlying provider (Stripe here). The *public* Web Billing key is
-// publishable, so it is safe to expose via NEXT_PUBLIC. The secret REST key
-// stays server-only in `lib/entitlement.ts`.
+// RevenueCat Web SDK checkout, PAY-FIRST. The visitor can buy as a guest: we
+// give them a silent anonymous session so RevenueCat has a stable app user id,
+// they pay (Stripe via RevenueCat Managed Payments handles card + email + VAT),
+// and ONLY AFTER payment do we ask them to create an account (Google/Apple or
+// email) — which links to the same id, so the entitlement carries over. No
+// pre-payment account wall. Entitlement lands on RevenueCat, which the
+// server-side hasActiveSubscription() reads, so reading unlocks on web AND app.
 
 type Plan = {
   id: string
   title: string
   price: string
   period: string
-  // Raw price for computing the annual saving.
   micros: number
-  // Opaque handle back to the RC package object, resolved at purchase time.
   index: number
 }
 
 const RC_KEY = process.env.NEXT_PUBLIC_RC_WEB_BILLING_KEY
 
-// Value props shared by both plans — every membership unlocks all of this.
 const BENEFITS = [
   "Every mystery in 12 languages",
   "Lots of new mysteries every week",
@@ -36,15 +31,15 @@ const BENEFITS = [
   "Reads on the web and the iOS app",
 ]
 
-export function SubscribePlans({ appUserId }: { appUserId: string }) {
+export function SubscribePlans({ initialUserId }: { initialUserId: string | null }) {
   const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
   const [plans, setPlans] = useState<Plan[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [buying, setBuying] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [purchased, setPurchased] = useState(false)
 
-  // Keep the live RC package objects around so a click can purchase the exact
-  // one the customer saw, without re-fetching.
   const [rcState, setRcState] = useState<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     purchases: any
@@ -61,13 +56,26 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
         return
       }
       try {
-        // Dynamic import: purchases-js touches `window`, so it must only load
-        // in the browser (never during SSR).
+        // Guest checkout: ensure a session (create a silent anonymous one if
+        // needed) so RevenueCat has a stable app user id to attach the purchase.
+        let uid = initialUserId
+        if (!uid) {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser()
+          uid = user?.id ?? null
+          if (!uid) {
+            const { data, error: aerr } = await supabase.auth.signInAnonymously()
+            if (aerr) throw aerr
+            uid = data.user?.id ?? null
+          }
+        }
+        if (!uid) throw new Error("no-session")
+
         const { Purchases } = await import("@revenuecat/purchases-js")
-        const purchases = Purchases.configure({ apiKey: RC_KEY, appUserId })
+        const purchases = Purchases.configure({ apiKey: RC_KEY, appUserId: uid })
         const offerings = await purchases.getOfferings()
-        const current = offerings.current
-        const pkgs = current?.availablePackages ?? []
+        const pkgs = offerings.current?.availablePackages ?? []
 
         if (cancelled) return
 
@@ -102,7 +110,7 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
     return () => {
       cancelled = true
     }
-  }, [appUserId])
+  }, [initialUserId, supabase])
 
   async function buy(plan: Plan) {
     if (!rcState) return
@@ -113,17 +121,13 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
     try {
       const pkg = rcState.packages[plan.index]
       await rcState.purchases.purchase({ rcPackage: pkg })
-      // Entitlement is now live on RevenueCat. Fire the value-tagged Purchase
-      // (Pixel + Conversions API) so Meta can optimise for subscribers, then
-      // re-render server components so the gate re-evaluates and the reader unlocks.
       trackMeta("Purchase", { value, currency: "GBP", content_ids: [plan.id], content_type: "product", num_items: 1 })
-      router.push("/browse?subscribed=1")
-      router.refresh()
+      // Paid! Now (and only now) ask them to create an account — no pre-pay wall.
+      setPurchased(true)
     } catch (e: unknown) {
-      // User-cancelled is not an error worth shouting about.
       const code = (e as { errorCode?: number })?.errorCode
       if (code === 1) {
-        // UserCancelledError
+        // UserCancelledError — no charge, no fuss
       } else {
         setError("The purchase didn't go through. No charge was made — please try again.")
       }
@@ -131,8 +135,7 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
     }
   }
 
-  // Graceful pre-launch fallback: no key configured yet → point to the app,
-  // exactly as before, so the live experience is never broken.
+  // Pre-launch fallback: no key configured yet.
   if (!RC_KEY) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6 text-center md:p-8">
@@ -141,6 +144,19 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
           subscription then unlocks everything here too.
         </p>
       </div>
+    )
+  }
+
+  // Paid → account creation (post-payment, so the sub follows them everywhere).
+  if (purchased) {
+    return (
+      <PostPurchase
+        supabase={supabase}
+        onSkip={() => {
+          router.push("/browse?subscribed=1")
+          router.refresh()
+        }}
+      />
     )
   }
 
@@ -187,7 +203,6 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
                   : "border-white/15 bg-[#0b0a0d]/88 hover:border-white/30"
               }`}
             >
-              {/* Fixed-height badge row keeps titles/prices aligned across cards */}
               <div className="mb-3 flex h-[26px] items-center">
                 {isAnnual && savePct > 0 ? (
                   <span className="rounded-full bg-[#c0392b] px-3 py-1 font-sans text-[11px] font-bold uppercase tracking-wide text-[#f7e9d0]">
@@ -228,8 +243,107 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
         <p className="text-center font-sans text-xs text-[#c98b6b]">{error}</p>
       ) : null}
       <p className="text-center font-sans text-[12px] text-[#6f665a]">
-        Secure checkout · Tax handled at checkout · Cancel anytime · Unlocks the iOS app too
+        Secure checkout · No account needed to start · Cancel anytime · Unlocks the iOS app too
       </p>
+    </div>
+  )
+}
+
+/* Post-payment account creation. The purchase is already done and reading works
+   on this session; this just links a real login so it follows them everywhere. */
+function PostPurchase({
+  supabase,
+  onSkip,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any
+  onSkip: () => void
+}) {
+  const [email, setEmail] = useState("")
+  const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+
+  async function oauth(provider: "google" | "apple") {
+    setErr(null)
+    try {
+      const { error } = await supabase.auth.linkIdentity({
+        provider,
+        options: { redirectTo: `${window.location.origin}/auth/callback?redirect=/browse` },
+      })
+      if (error) throw error
+      // success → browser redirects to the provider
+    } catch {
+      setErr("Couldn't connect that account. Try email instead, or start reading and set it up later.")
+    }
+  }
+
+  async function saveEmail(e: FormEvent) {
+    e.preventDefault()
+    if (!email) return
+    setBusy(true)
+    setErr(null)
+    const { error } = await supabase.auth.updateUser({ email })
+    setBusy(false)
+    if (error) setErr("Couldn't save that email — try another, or start reading and set it up later.")
+    else setSent(true)
+  }
+
+  return (
+    <div className="rounded-3xl border border-[rgba(210,163,95,.35)] bg-[rgba(210,163,95,.06)] p-7 text-center backdrop-blur-md md:p-9">
+      <p className="ww-eyebrow mb-3 justify-center">Payment complete</p>
+      <h2 className="ww-display text-3xl font-medium text-[#f7ecd6] md:text-4xl">You&apos;re subscribed 🎉</h2>
+
+      {sent ? (
+        <>
+          <p className="mx-auto mt-4 max-w-md font-serif text-[16px] leading-relaxed text-[#d9cbb5]">
+            Check your email to confirm your account — then you can sign in on any device.
+            You can start reading right now.
+          </p>
+          <button type="button" onClick={onSkip} className="ww-btn ww-btn-gold mt-7 !min-h-[52px] !px-9 text-[15px]">
+            Start reading →
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="mx-auto mt-3 max-w-md font-serif text-[15.5px] leading-relaxed text-[#d9cbb5]">
+            Create your account so your subscription follows you to every device and the iOS app.
+          </p>
+
+          <div className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
+            <button type="button" onClick={() => oauth("google")} className="ww-btn ww-btn-ghost !min-h-[48px] w-full">
+              Continue with Google
+            </button>
+            <button type="button" onClick={() => oauth("apple")} className="ww-btn ww-btn-ghost !min-h-[48px] w-full">
+              Continue with Apple
+            </button>
+
+            <div className="my-1 flex items-center gap-3 text-[11px] uppercase tracking-widest text-[#6f665a]">
+              <span className="h-px flex-1 bg-white/10" /> or <span className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <form onSubmit={saveEmail} className="flex flex-col gap-2.5">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@email.com"
+                className="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 font-sans text-sm text-[#f5ead4] placeholder:text-[#6f665a] focus:border-[rgba(210,163,95,.6)] focus:outline-none"
+              />
+              <button type="submit" disabled={busy} className="ww-btn ww-btn-gold !min-h-[48px] w-full disabled:opacity-60">
+                {busy ? "Saving…" : "Create account with email"}
+              </button>
+            </form>
+          </div>
+
+          {err ? <p className="mt-3 font-sans text-xs text-[#c98b6b]">{err}</p> : null}
+
+          <button type="button" onClick={onSkip} className="mt-5 font-sans text-[13px] text-[#a99c8b] underline underline-offset-4 hover:text-[#f5ead4]">
+            Start reading — I&apos;ll set this up later
+          </button>
+        </>
+      )}
     </div>
   )
 }
