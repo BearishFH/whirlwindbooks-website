@@ -368,9 +368,23 @@ function PagedBody({
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      {/* tap zones */}
-      <button type="button" aria-label="Previous page" onClick={onPrev} className="absolute inset-y-0 left-0 z-10 w-[22%] cursor-w-resize" />
-      <button type="button" aria-label="Next page" onClick={onNext} className="absolute inset-y-0 right-0 z-10 w-[22%] cursor-e-resize" />
+      {/* page-turn zones with clearly-visible arrows (large tap targets) */}
+      <button type="button" aria-label="Previous page" onClick={onPrev} className="group absolute inset-y-0 left-0 z-10 flex w-[18%] items-center justify-start pl-1.5 md:pl-3">
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-full opacity-75 shadow-md transition-all group-hover:opacity-100 group-active:scale-90"
+          style={{ background: `${t.bg}e6`, border: `1px solid ${t.ui}`, color: t.accent }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        </span>
+      </button>
+      <button type="button" aria-label="Next page" onClick={onNext} className="group absolute inset-y-0 right-0 z-10 flex w-[18%] items-center justify-end pr-1.5 md:pr-3">
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-full opacity-75 shadow-md transition-all group-hover:opacity-100 group-active:scale-90"
+          style={{ background: `${t.bg}e6`, border: `1px solid ${t.ui}`, color: t.accent }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+        </span>
+      </button>
 
       <div
         ref={viewport}

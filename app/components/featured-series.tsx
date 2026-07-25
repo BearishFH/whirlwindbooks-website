@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { APP_STORE_URL } from "@/lib/links"
 import { BOOKS, type Book } from "@/lib/books"
 import Reveal from "./reveal"
 
@@ -194,12 +193,10 @@ export default function FeaturedSeries() {
                   Chapter 1 is free · read or listen
                 </span>
                 <a
-                  href={APP_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/read/${active.id}`}
                   className="ww-btn ww-btn-gold !min-h-[48px] !text-[15px]"
                 >
-                  Read it in the app
+                  Read Chapter 1 free
                   <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
                     <path
                       d="M5 12h14M13 6l6 6-6 6"

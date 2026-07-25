@@ -3,6 +3,7 @@
 
 export type Book = {
   slug: string
+  id: string
   title: string
   genre: string
   hook: string
@@ -12,6 +13,7 @@ export type Book = {
 export const BOOKS: Book[] = [
   {
     slug: "the-cyprus-agenda",
+    id: "e2ee5783-4c9c-48eb-a9be-251c597e8902",
     title: "The Cyprus Agenda",
     genre: "Thriller · International intrigue",
     hook: "Twelve bottles. One could topple governments.",
@@ -20,6 +22,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "death-by-golden-honey-spirals",
+    id: "f6bce0d6-4ac1-4d5a-ac4b-e242ec6dffd1",
     title: "Death by Golden Honey Spirals",
     genre: "Cozy · Culinary mystery",
     hook: "The diplomat had seventeen minutes to live.",
@@ -28,6 +31,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "aztec-gold-blood-red",
+    id: "9a8d9c06-23f7-4f7c-9bdb-34d6e089c1e9",
     title: "Aztec Gold, Blood Red",
     genre: "Thriller · Heist",
     hook: "A poisoned dart. A poolside toast. A killer still smiling.",
@@ -36,6 +40,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "blood-diamonds-silk-scarves",
+    id: "78624d1a-6628-4dd2-88a2-bac1ba8620d6",
     title: "Blood Diamonds & Silk Scarves",
     genre: "Thriller · International",
     hook: "The courier arrived at the worst possible moment.",
@@ -44,6 +49,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "blood-and-pearls",
+    id: "32d2f974-a936-4197-8b74-1a30d661372e",
     title: "Blood and Pearls",
     genre: "Thriller · Family revenge",
     hook: "The winch handle was still slick with blood.",
@@ -52,6 +58,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "fire-spice",
+    id: "e910bd35-1540-49e2-b076-ccfb82c12a9c",
     title: "Fire & Spice",
     genre: "Romance · Mystery",
     hook: "A chef, a dead critic, and a past she buried.",
@@ -60,6 +67,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "the-pearl-diver-s-secret",
+    id: "92f88dac-b709-4040-a6e6-689b9ee9677c",
     title: "The Pearl Diver's Secret",
     genre: "Thriller · Coastal",
     hook: "A groom dies underwater at his own wedding.",
@@ -68,6 +76,7 @@ export const BOOKS: Book[] = [
   },
   {
     slug: "archivist-of-algiers",
+    id: "4b72fb45-7fd2-48ca-98cb-38a37f31ba34",
     title: "Archivist of Algiers",
     genre: "Thriller · Espionage",
     hook: "One classified file. A mentor's warning, too late.",

@@ -1,4 +1,3 @@
-import { APP_STORE_URL } from "@/lib/links"
 import Reveal from "./reveal"
 
 const MODES = [
@@ -58,12 +57,7 @@ export default function ReadOrListen() {
           </dl>
 
           <Reveal delay={200} className="mt-10">
-            <a
-              href={APP_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ww-btn ww-btn-ghost w-full sm:w-auto"
-            >
+            <a href="/browse" className="ww-btn ww-btn-ghost w-full sm:w-auto">
               Start with chapter one
             </a>
           </Reveal>
