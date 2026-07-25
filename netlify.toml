@@ -10,8 +10,11 @@
   # (server-only) to enable cross-platform entitlement checks in lib/entitlement.
   NEXT_PUBLIC_SUPABASE_URL = "https://zpmqhpuhjqbomrpuuoye.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbXFocHVoanFib21ycHV1b3llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3MjA0NDgsImV4cCI6MjA2MzI5NjQ0OH0.NThXXKetrK2iPAENglmzJB8tuIXxEZoMqK1--jXWeWA"
-  # RevenueCat Web Billing (Paddle-backed) publishable key — powers /subscribe.
-  NEXT_PUBLIC_RC_WEB_BILLING_KEY = "pdl_FnsvxWYiPyOkOQPtcfjzJGVreajk"
+  # RevenueCat Web Billing (Stripe provider) publishable key — powers /subscribe.
+  # NOTE: this value overrides anything set in the Netlify UI, so it must be the
+  # correct provider key. Verified via RevenueCat API to return the live Stripe
+  # products ($9.99/mo, $59.99/yr). The old Paddle key (pdl_…) is retired.
+  NEXT_PUBLIC_RC_WEB_BILLING_KEY = "strp_wCtAZSyEGtgRTUHQCqdmacYJIdF"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
