@@ -1,17 +1,24 @@
 "use client"
 
-import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { trackMeta } from "@/lib/meta-pixel"
 
 // RevenueCat Web SDK checkout, PAY-FIRST. The visitor can buy as a guest: we
-// give them a silent anonymous session so RevenueCat has a stable app user id,
-// they pay (Stripe via RevenueCat Managed Payments handles card + email + VAT),
-// and ONLY AFTER payment do we ask them to create an account (Google/Apple or
-// email) — which links to the same id, so the entitlement carries over. No
-// pre-payment account wall. Entitlement lands on RevenueCat, which the
-// server-side hasActiveSubscription() reads, so reading unlocks on web AND app.
+// give them a silent anonymous session so RevenueCat has a stable app user id
+// (== the Supabase auth UUID), they pay (Stripe via RevenueCat Managed Payments
+// handles card + email + VAT), and ONLY AFTER payment do we REQUIRE them to
+// connect Apple or Google.
+//
+// Why Apple/Google and nothing else: the iOS app signs in ONLY with Apple/Google
+// (no email/password login exists there). RevenueCat's appUserId is the Supabase
+// auth UUID on BOTH web and iOS, so linking the SAME Apple/Google identity to the
+// guest's UUID means signing in with it on the phone returns that exact UUID —
+// and the subscription is already attached to it. One account, buy once, works
+// everywhere. An email-only account could never sign in on iOS, so we don't
+// offer it. Entitlement lands on RevenueCat, which server-side
+// hasActiveSubscription() reads, so reading unlocks on web AND app.
 
 type Plan = {
   id: string
@@ -122,8 +129,18 @@ export function SubscribePlans({ initialUserId }: { initialUserId: string | null
       const pkg = rcState.packages[plan.index]
       await rcState.purchases.purchase({ rcPackage: pkg })
       trackMeta("Purchase", { value, currency: "GBP", content_ids: [plan.id], content_type: "product", num_items: 1 })
-      // Paid! Now (and only now) ask them to create an account — no pre-pay wall.
-      setPurchased(true)
+      // Paid! If they already signed in with a real (non-anonymous) account, the
+      // sub is already on it — go straight to reading. Only guests need to
+      // connect Apple/Google so the sub can follow them to iOS.
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user && !user.is_anonymous) {
+        router.push("/browse?subscribed=1")
+        router.refresh()
+      } else {
+        setPurchased(true)
+      }
     } catch (e: unknown) {
       const code = (e as { errorCode?: number })?.errorCode
       if (code === 1) {
@@ -147,17 +164,9 @@ export function SubscribePlans({ initialUserId }: { initialUserId: string | null
     )
   }
 
-  // Paid → account creation (post-payment, so the sub follows them everywhere).
+  // Paid → REQUIRED account connect (post-payment, so the sub follows them to iOS).
   if (purchased) {
-    return (
-      <PostPurchase
-        supabase={supabase}
-        onSkip={() => {
-          router.push("/browse?subscribed=1")
-          router.refresh()
-        }}
-      />
-    )
+    return <PostPurchase supabase={supabase} />
   }
 
   if (loading) {
@@ -243,50 +252,60 @@ export function SubscribePlans({ initialUserId }: { initialUserId: string | null
         <p className="text-center font-sans text-xs text-[#c98b6b]">{error}</p>
       ) : null}
       <p className="text-center font-sans text-[12px] text-[#6f665a]">
-        Secure checkout · No account needed to start · Cancel anytime · Unlocks the iOS app too
+        Secure checkout · Pay first, connect your account after · Cancel anytime · Unlocks the iOS app too
       </p>
     </div>
   )
 }
 
-/* Post-payment account creation. The purchase is already done and reading works
-   on this session; this just links a real login so it follows them everywhere. */
+/* Post-payment: REQUIRED account connect. The purchase is already on this
+   session's Supabase UUID; connecting Apple/Google links a real identity to that
+   SAME UUID, so signing in with it on iOS (which uses Apple/Google) returns the
+   same UUID with the subscription already attached. We deliberately offer only
+   Apple/Google and no skip — an email-only account can't sign in on iOS, and a
+   never-connected guest sub can't follow them to their phone. */
 function PostPurchase({
   supabase,
-  onSkip,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any
-  onSkip: () => void
 }) {
-  const [email, setEmail] = useState("")
-  const [sent, setSent] = useState(false)
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState<"google" | "apple" | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  // After a link fails because the identity already belongs to an existing
+  // Whirlwind account (a returning user), switch the buttons to a full sign-in
+  // with that account instead of trying to link again.
+  const [signInMode, setSignInMode] = useState(false)
 
-  async function oauth(provider: "google" | "apple") {
+  const redirectTo = `${window.location.origin}/auth/callback?redirect=/browse`
+
+  async function connect(provider: "google" | "apple") {
+    setBusy(provider)
     setErr(null)
-    try {
-      const { error } = await supabase.auth.linkIdentity({
-        provider,
-        options: { redirectTo: `${window.location.origin}/auth/callback?redirect=/browse` },
-      })
-      if (error) throw error
+
+    if (signInMode) {
+      // Returning user: sign in with their existing account. RevenueCat is set to
+      // transfer the just-made purchase to the account they sign into.
+      const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } })
+      if (error) {
+        setBusy(null)
+        setErr("Couldn't sign in with that account. Please try the other option.")
+      }
       // success → browser redirects to the provider
-    } catch {
-      setErr("Couldn't connect that account. Try email instead, or start reading and set it up later.")
+      return
     }
-  }
 
-  async function saveEmail(e: FormEvent) {
-    e.preventDefault()
-    if (!email) return
-    setBusy(true)
-    setErr(null)
-    const { error } = await supabase.auth.updateUser({ email })
-    setBusy(false)
-    if (error) setErr("Couldn't save that email — try another, or start reading and set it up later.")
-    else setSent(true)
+    // New customer (the common case): link the identity to this UUID, keeping the
+    // subscription exactly where it is.
+    const { error } = await supabase.auth.linkIdentity({ provider, options: { redirectTo } })
+    if (error) {
+      setBusy(null)
+      // Nearly always: this Apple/Google account is already registered with
+      // Whirlwind. Offer to sign in with it instead — the sub will follow.
+      setSignInMode(true)
+      setErr("Looks like you already have a Whirlwind account with that. Tap again to sign in — your subscription will move to it.")
+    }
+    // success → browser redirects to the provider, then back to /browse
   }
 
   return (
@@ -294,56 +313,36 @@ function PostPurchase({
       <p className="ww-eyebrow mb-3 justify-center">Payment complete</p>
       <h2 className="ww-display text-3xl font-medium text-[#f7ecd6] md:text-4xl">You&apos;re subscribed 🎉</h2>
 
-      {sent ? (
-        <>
-          <p className="mx-auto mt-4 max-w-md font-serif text-[16px] leading-relaxed text-[#d9cbb5]">
-            Check your email to confirm your account — then you can sign in on any device.
-            You can start reading right now.
-          </p>
-          <button type="button" onClick={onSkip} className="ww-btn ww-btn-gold mt-7 !min-h-[52px] !px-9 text-[15px]">
-            Start reading →
-          </button>
-        </>
-      ) : (
-        <>
-          <p className="mx-auto mt-3 max-w-md font-serif text-[15.5px] leading-relaxed text-[#d9cbb5]">
-            Create your account so your subscription follows you to every device and the iOS app.
-          </p>
+      <p className="mx-auto mt-3 max-w-md font-serif text-[15.5px] leading-relaxed text-[#d9cbb5]">
+        One last step — connect your account so your subscription works on your iPhone
+        and every device. This is how you&apos;ll sign in.
+      </p>
 
-          <div className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
-            <button type="button" onClick={() => oauth("google")} className="ww-btn ww-btn-ghost !min-h-[48px] w-full">
-              Continue with Google
-            </button>
-            <button type="button" onClick={() => oauth("apple")} className="ww-btn ww-btn-ghost !min-h-[48px] w-full">
-              Continue with Apple
-            </button>
+      <div className="mx-auto mt-6 flex max-w-sm flex-col gap-2.5">
+        <button
+          type="button"
+          disabled={busy !== null}
+          onClick={() => connect("apple")}
+          className="ww-btn ww-btn-gold !min-h-[50px] w-full disabled:opacity-60"
+        >
+          {busy === "apple" ? "Connecting…" : signInMode ? "Sign in with Apple" : "Continue with Apple"}
+        </button>
+        <button
+          type="button"
+          disabled={busy !== null}
+          onClick={() => connect("google")}
+          className="ww-btn ww-btn-ghost !min-h-[50px] w-full disabled:opacity-60"
+        >
+          {busy === "google" ? "Connecting…" : signInMode ? "Sign in with Google" : "Continue with Google"}
+        </button>
+      </div>
 
-            <div className="my-1 flex items-center gap-3 text-[11px] uppercase tracking-widest text-[#6f665a]">
-              <span className="h-px flex-1 bg-white/10" /> or <span className="h-px flex-1 bg-white/10" />
-            </div>
+      {err ? <p className="mx-auto mt-4 max-w-sm font-sans text-xs leading-relaxed text-[#c98b6b]">{err}</p> : null}
 
-            <form onSubmit={saveEmail} className="flex flex-col gap-2.5">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@email.com"
-                className="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 font-sans text-sm text-[#f5ead4] placeholder:text-[#6f665a] focus:border-[rgba(210,163,95,.6)] focus:outline-none"
-              />
-              <button type="submit" disabled={busy} className="ww-btn ww-btn-gold !min-h-[48px] w-full disabled:opacity-60">
-                {busy ? "Saving…" : "Create account with email"}
-              </button>
-            </form>
-          </div>
-
-          {err ? <p className="mt-3 font-sans text-xs text-[#c98b6b]">{err}</p> : null}
-
-          <button type="button" onClick={onSkip} className="mt-5 font-sans text-[13px] text-[#a99c8b] underline underline-offset-4 hover:text-[#f5ead4]">
-            Start reading — I&apos;ll set this up later
-          </button>
-        </>
-      )}
+      <p className="mx-auto mt-5 max-w-sm font-sans text-[11.5px] leading-relaxed text-[#6f665a]">
+        Apple &amp; Google are the sign-in methods the iPhone app uses, so your membership
+        unlocks there automatically.
+      </p>
     </div>
   )
 }
