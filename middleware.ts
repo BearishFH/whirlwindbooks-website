@@ -8,6 +8,8 @@ const REVENUECAT = "https://*.revenuecat.com https://*.rev.cat"
 // RevenueCat Web Billing settles through Stripe (Managed Payments), so the
 // hosted checkout embeds Stripe.js and its 3-D Secure / fraud endpoints.
 const STRIPE = "https://*.stripe.com https://*.stripe.network"
+// Meta Pixel: fbevents.js from connect.facebook.net + beacons to facebook.com.
+const META = "https://connect.facebook.net https://*.facebook.com"
 
 // Per-request nonce lets us drop 'unsafe-inline' from script-src: only Next's
 // own scripts (which get this nonce) and scripts they load ('strict-dynamic')
@@ -16,11 +18,11 @@ const STRIPE = "https://*.stripe.com https://*.stripe.network"
 function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' ${STRIPE} https:`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' ${STRIPE} ${META} https:`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${SUPABASE} ${STRIPE}`,
+    `img-src 'self' data: blob: ${SUPABASE} ${STRIPE} ${META}`,
     `media-src 'self' blob: ${SUPABASE}`,
-    `connect-src 'self' ${SUPABASE} ${SUPABASE_WS} ${REVENUECAT} ${STRIPE}`,
+    `connect-src 'self' ${SUPABASE} ${SUPABASE_WS} ${REVENUECAT} ${STRIPE} ${META}`,
     `frame-src 'self' ${REVENUECAT} ${STRIPE}`,
     "worker-src 'self' blob:",
     "font-src 'self' data:",

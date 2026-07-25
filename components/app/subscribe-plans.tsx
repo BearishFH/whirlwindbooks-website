@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { trackMeta } from "@/lib/meta-pixel"
 
 // RevenueCat Web SDK checkout. This mirrors the iOS paywall: the visitor picks
 // a plan, RevenueCat presents the hosted checkout (settled through Stripe via
@@ -107,11 +108,15 @@ export function SubscribePlans({ appUserId }: { appUserId: string }) {
     if (!rcState) return
     setBuying(plan.id)
     setError(null)
+    const value = plan.micros ? plan.micros / 1_000_000 : undefined
+    trackMeta("InitiateCheckout", { value, currency: "GBP", content_ids: [plan.id], content_type: "product" })
     try {
       const pkg = rcState.packages[plan.index]
       await rcState.purchases.purchase({ rcPackage: pkg })
-      // Entitlement is now live on RevenueCat. Re-render server components so
-      // the gate re-evaluates and the reader unlocks.
+      // Entitlement is now live on RevenueCat. Fire the value-tagged Purchase
+      // (Pixel + Conversions API) so Meta can optimise for subscribers, then
+      // re-render server components so the gate re-evaluates and the reader unlocks.
+      trackMeta("Purchase", { value, currency: "GBP", content_ids: [plan.id], content_type: "product", num_items: 1 })
       router.push("/browse?subscribed=1")
       router.refresh()
     } catch (e: unknown) {

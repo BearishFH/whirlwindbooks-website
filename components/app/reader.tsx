@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import type { Chapter } from "@/lib/reader"
+import { trackMeta } from "@/lib/meta-pixel"
 
 /* ------------------------------------------------------------------ themes */
 type ThemeId = "noir" | "dusk" | "slate" | "sepia" | "paper"
@@ -131,6 +132,14 @@ export function Reader({
       /* ignore */
     }
   }, [chapterIdx, page, storageKey])
+
+  // Meta funnel signal: opening the reader = the visitor started reading Chapter 1
+  // (this is the mid-funnel event the ad campaign optimises for). Once per book.
+  useEffect(() => {
+    trackMeta("ViewContent", { content_ids: [bookId], content_type: "product", content_name: title })
+    trackMeta("StartReadingCh1", { content_ids: [bookId], content_name: title }, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId])
 
   const t = THEMES[prefs.theme]
   const font = FONTS.find((f) => f.id === prefs.font) ?? FONTS[0]
