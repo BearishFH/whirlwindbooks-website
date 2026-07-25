@@ -16,12 +16,22 @@ export function trackMeta(event: string, params: Params = {}, custom = false) {
   const eventId =
     globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.round(Math.random() * 1e9)}`
 
-  // 1) Browser Pixel (if loaded)
-  try {
-    window.fbq?.(custom ? "trackCustom" : "track", event, params, { eventID: eventId })
-  } catch {
-    /* ignore */
+  // 1) Browser Pixel. The reader's StartReadingCh1 can fire before the pixel
+  //    script has defined fbq, so retry briefly rather than drop the event. The
+  //    event is held by consent-mode until the visitor accepts.
+  let tries = 0
+  const fire = () => {
+    if (typeof window.fbq === "function") {
+      try {
+        window.fbq(custom ? "trackCustom" : "track", event, params, { eventID: eventId })
+      } catch {
+        /* ignore */
+      }
+    } else if (tries++ < 20) {
+      setTimeout(fire, 150)
+    }
   }
+  fire()
 
   // Respect cookie consent: the browser Pixel is held by consent-mode until the
   // visitor accepts, and we must not send the server-side copy either without it.
