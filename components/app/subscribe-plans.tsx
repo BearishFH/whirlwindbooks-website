@@ -29,6 +29,8 @@ type Plan = {
   index: number
 }
 
+// Web Billing public key (Stripe provider → "strp_…"). Inlined at build time, so
+// changing it in Netlify requires a rebuild of THIS module to take effect.
 const RC_KEY = process.env.NEXT_PUBLIC_RC_WEB_BILLING_KEY
 
 const BENEFITS = [
