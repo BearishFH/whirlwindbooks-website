@@ -23,6 +23,16 @@ export function trackMeta(event: string, params: Params = {}, custom = false) {
     /* ignore */
   }
 
+  // Respect cookie consent: the browser Pixel is held by consent-mode until the
+  // visitor accepts, and we must not send the server-side copy either without it.
+  let consent: string | null = null
+  try {
+    consent = localStorage.getItem("ww-consent")
+  } catch {
+    /* ignore */
+  }
+  if (consent !== "granted") return
+
   // 2) Server Conversions API echo (dedup via the shared eventId). keepalive so
   //    it still sends if the click navigates away immediately.
   try {

@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inria_Serif, Inter, Spectral, Crimson_Pro, Cormorant_Garamond } from "next/font/google"
 import { MetaPixel } from "@/app/components/meta-pixel"
+import { CookieConsent } from "@/app/components/cookie-consent"
 import "./globals.css"
 
 const inriaSerif = Inria_Serif({
@@ -104,6 +105,7 @@ export default function RootLayout({
       <body className="overflow-x-hidden bg-[#0a0909] font-serif text-[#f5ead4] antialiased">
         <MetaPixel />
         {children}
+        <CookieConsent />
       </body>
     </html>
   )
